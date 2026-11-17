@@ -55,6 +55,27 @@ Funktionsumfang der Oberfläche.
   Position, wenn sie von der Kontowährung abweicht.
 - Alle Beträge, Mengen und Anteile sind im Privatmodus verdeckt, Wertpapiernamen auf Wunsch.
 
+### Kopfbereich und Diagramme
+
+- **Diagramm-Steuerung unter dem Kopf-Diagramm (#634):** Ausgeblendet / Linie / Balken / Kreis
+  und „Balken je“ direkt unter dem Diagramm, auch in Darstellung › „Diagramm anzeigen“ und
+  „Diagramm“ sowie per Rechtsklick. „Ausgeblendet“ blendet nur das Diagramm aus. Der **Kreis**
+  zeigt bei einer Kategorie die Anteile der Unterkategorien (ein Klick in der Legende öffnet
+  sie), sonst die Ausgaben nach Kategorie im Zeitraum; ab neun Teilen „Sonstige“.
+  Einstellungen › Allgemein › Saldoverlauf wählt nur noch „Balken je“.
+- **Kategorie-Diagramm:** Balken je Tag, Monat, Quartal oder Jahr (#557), als Linie oder Balken.
+- **Das Kontostandsdiagramm folgt der Buchungsliste (#593):** Beim Scrollen wandert ein Marker
+  mit Datum und Tageskontostand zum Tag am oberen Listenrand, auch zum Tag einer ausgewählten
+  Buchung; der Tageskopf dieses Tages (oder des Tages unter dem Mauszeiger im Diagramm) ist
+  hervorgehoben.
+- **Cashflow und Monatsbudgets einklappbar (#603):** Pfeil vor dem Titel; eingeklappt zeigt die
+  Karte den Saldo des letzten Zeitraums bzw. Ausgaben und Budget aller Budgets. Einheitliche,
+  engere Abstände der Karten über der Liste; im minimierten Kopfbereich stehen die Filter in der
+  Titelzeile.
+- **Kontoinhaber** unter der Bank/IBAN-Zeile (#606).
+- **Kopf-Summe nur in Basiswährung (#569):** Andere Währungen stehen darunter als „Zusätzlich: …“
+  und werden nicht mitgezählt.
+
 ## Funktionsstand 0.7.5 (Kern 0.8.0)
 
 Mit diesem Schritt kann die Linux-Oberfläche alles, was die Mac-App 0.7.5 kann – bis auf die
