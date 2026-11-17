@@ -34,6 +34,27 @@ Funktionsumfang der Oberfläche.
   **Buchungen nach Konten**; ein Klick auf ein Konto zeigt dessen Buchungen mit diesem Tag in der
   Liste.
 
+### Depot und Sachwerte (#564, #625)
+
+- **Eigene Depotansicht:** Ein Wertpapierdepot zeigt statt der Buchungsliste Kopfkarte mit
+  Depotwert (rechts, mit Hinweis bei Abweichung von der Summe der Positionen), vier Kennzahlen
+  (Unrealisierte GuV, Tagesveränderung, Ausschüttungen, Gebühren & Steuern), die
+  **Zusammensetzung** (Kreis, Balken oder Kacheln; nach Position, Anlageklasse oder Instrument;
+  ein Klick filtert die Tabelle) und eine sortierbare **Positionstabelle** mit Summenzeile.
+- **Positionen | Aktivitäten** in der Symbolleiste (Strg+1 / Strg+2, auch in der
+  Befehlspalette): Wertpapieraktivitäten mit Filter (Käufe, Verkäufe, Ausschüttungen, Kosten) und
+  dem Sprung **zur Buchung des Verrechnungskontos**. Das Suchfeld durchsucht hier die Positionen
+  bzw. Aktivitäten („Wertpapier, ISIN oder WKN“).
+- **Sachwerte-Konten** bekommen dieselben Bausteine: Kennzahlen (Einstandswert, Unrealisierte
+  GuV, Tagesveränderung, Größte Position), Zusammensetzung und die gemeinsame Tabelle;
+  „Goldpreis aktualisieren“ und „Sachwert hinzufügen“ im Kopf, ehemalige Positionen darunter.
+- **Vermögen › Wertpapiere / Sachwerte** nutzen dieselbe Zusammensetzung, dieselben Kennzahlen
+  und dieselbe Tabelle (gleiche Wertpapiere aus mehreren Depots in einer Zeile, mit Depotname);
+  die Summenkarte steht in voller Breite mit dem Gesamtwert rechts.
+- **Positionen in Handelswährung:** Kurs und „Marktwert (Handelswährung)“ in der Währung der
+  Position, wenn sie von der Kontowährung abweicht.
+- Alle Beträge, Mengen und Anteile sind im Privatmodus verdeckt, Wertpapiernamen auf Wunsch.
+
 ## Funktionsstand 0.7.5 (Kern 0.8.0)
 
 Mit diesem Schritt kann die Linux-Oberfläche alles, was die Mac-App 0.7.5 kann – bis auf die
