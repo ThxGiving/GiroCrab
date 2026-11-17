@@ -13,7 +13,7 @@ Funktionsumfang der Oberfläche.
 ### Privatmodus (#719)
 
 - **Darstellung › Privatmodus** (Strg+Umschalt+H) und das **Auge in der Symbolleiste** blenden
-  Beträge aus, wenn du die App jemandem zeigst: Salden, Buchungsbeträge, Summen, Anteile,
+  Beträge aus, wenn Sie die App jemandem zeigen: Salden, Buchungsbeträge, Summen, Anteile,
   Budgets, Kredittilgung, Depot und Vermögen, Achsenwerte und Ablesewerte der Diagramme.
 - **Einstellungen › Allgemein:** Schalter „Privatmodus“ und „Im Privatmodus ausblenden“ mit
   **Beträge** oder **Beträge und persönliche Angaben** (dann auch Namen, Kontonummern und
@@ -22,6 +22,17 @@ Funktionsumfang der Oberfläche.
   zeigen dann „•••“. „Problem melden“ schwärzt wie bisher und zusätzlich alles, was der
   Privatmodus verdeckt.
 - Startoption `--privacy[=all]` für Screenshots.
+
+### Tags
+
+- **Buchungen nach Tags filtern und auswerten:** In der Filterzeile über der Buchungsliste
+  öffnet der Knopf **„Tags“** das Fenster „Nach Tags filtern“. Mehrere angekreuzte Tags zeigen
+  nur Buchungen, die alle tragen; „Ohne Tag“ zeigt Buchungen ohne Tag. Je Tag stehen Anzahl und
+  Summe für den Zeitraum und die übrigen Filter der Liste. Der Knopf nennt nur die Zahl der Tags,
+  der Druck nennt den Filter in der Kopfzeile.
+- **Tags verwalten:** Die Buchungszahl eines Tags zeigt beim Darüberfahren oder per Klick die
+  **Buchungen nach Konten**; ein Klick auf ein Konto zeigt dessen Buchungen mit diesem Tag in der
+  Liste.
 
 ## Funktionsstand 0.7.5 (Kern 0.8.0)
 

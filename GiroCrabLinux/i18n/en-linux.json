@@ -1,7 +1,7 @@
 {
   " und ": " and ",
-  "%1 Bit · Schlüssel %2, Version %3": "%1 bits · key %2, version %3",
   "%1 Belege nach „%2/GiroCrab-Belege“ exportiert": "%1 receipts exported to “%2/GiroCrab-Belege”",
+  "%1 Bit · Schlüssel %2, Version %3": "%1 bits · key %2, version %3",
   "%1 Tags löschen …": "Delete %1 Tags …",
   "%1 Tags löschen?": "Delete %1 tags?",
   "%1 Umsätze übernommen – weitere werden geladen …": "%1 transactions imported – loading more…",
@@ -175,7 +175,7 @@
   "Sparpläne": "Savings Plans",
   "Sperrbildschirm testen": "Test Lock Screen",
   "Stattdessen diesen Tag behalten": "Keep this tag instead",
-  "Strg+N Neuer Tag · ↩ Umbenennen · Entf Löschen · Esc Auswahl aufheben": "Ctrl+N New Tag · ↩ Rename · Del Delete · Esc Deselect",
+  "Strg+N Neuer Tag · ↩ Umbenennen · Entf Löschen · Esc Auswahl aufheben · Zahl: je Konto": "Ctrl+N New Tag · ↩ Rename · Del Delete · Esc Deselect · Count: by account",
   "Strg-Klick fügt eine Buchung hinzu oder entfernt sie, ⇧-Klick wählt einen Bereich, Strg+A alle.": "Ctrl-click adds or removes a transaction, ⇧-click selects a range, Ctrl+A all.",
   "Suchen…": "Search…",
   "Tag löschen": "Delete Tag",
