@@ -94,6 +94,26 @@ Funktionsumfang der Oberfläche.
 - Die Skripte im Browser sind die der Mac-App (`scripts/gen-equateplus-qml.py`, abgeglichen von
   `scripts/test-equateplus-linux.cjs`). Mit einem echten EquatePlus-Zugang noch nicht getestet.
 
+### Kleinere Punkte
+
+- **Kategoriesummen folgen den Filtern (#621):** Die Summen unter „Kategorien“ in der
+  Seitenleiste berücksichtigen neben dem Zeitraum auch Status, Einnahmen/Ausgaben und – in den
+  Kategorieansichten – den Kontenfilter. Darunter steht dann „Summen gefiltert – …“ (ohne
+  Kontonamen). Die Summen laden im Hintergrund.
+- **Umbuchung vom Tagesgeldkonto (#582):** Tagesgeldkonten mit IBAN bei einer Bank, die
+  Überweisungen ausführen kann, stehen im Überweisungsformular unter „Von Konto“. Von dort ist
+  nur eine Umbuchung auf eigene Girokonten möglich (Konten derselben Bank zuerst); statt der
+  Auswahl „Überweisung/Umbuchung“ steht „Vom Tagesgeldkonto sind nur Umbuchungen auf eigene
+  Girokonten möglich.“ Daueraufträge, Sammelüberweisungen und Lastschriften bieten
+  Tagesgeldkonten weiterhin nicht an.
+- **„Umbuchung erkannt: …“ (#574):** Bei einer Umbuchung nennt die Detailspalte den Grund:
+  eigene Gegenkonto-IBAN, Kategorie „Umbuchungen“ oder der Buchungstext.
+- **Lastschriften (#673):** Mandatsliste und Inspektor nennen die Mandatsart „Einmalmandat (EM)“
+  bzw. „Dauermandat (AM)“ mit erklärendem Tooltip, ebenso der Schalter „Einmaliges Mandat“.
+- **Beleg-Symbol in der Buchungsliste (#675):** Tooltip „2 Beleg(e) – Leertaste für Vorschau“.
+- **Vermögen (#587):** In den Kontolisten steht der Kontoname in bis zu zwei Zeilen, darunter
+  „Bank · Inhaber“.
+
 ## Funktionsstand 0.7.5 (Kern 0.8.0)
 
 Mit diesem Schritt kann die Linux-Oberfläche alles, was die Mac-App 0.7.5 kann – bis auf die
