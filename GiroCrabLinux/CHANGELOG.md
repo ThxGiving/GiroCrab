@@ -33,6 +33,29 @@ Funktionsumfang der Oberfläche.
 - **Abweichung von der Mac-App:** Die gespeicherte Anmeldung (Benutzername und Passwort im Tresor,
   ins Anmeldeformular eingetragen) gibt es unter Linux nicht. Sie melden sich im Fenster selbst an.
 
+### Automatischer Abruf (#546, #567)
+
+- **Einstellungen › Allgemein › Abruf › „Automatischer Abruf“:** Aus (Standard), jede Stunde oder
+  alle 2, 4, 6, 12 oder 24 Stunden. GiroCrab ruft die Kontostände im gewählten Abstand ab, solange
+  die App läuft und der Tresor entsperrt ist; bei gesperrtem Tresor wird der Abruf nach dem
+  Entsperren nachgeholt. Die Wahl bleibt über Neustarts erhalten.
+- Abgerufen werden nur Zugänge mit gespeicherter PIN oder gültiger Freigabe, nie mit einem
+  Anmeldedialog: Verlangt die Bank eine TAN oder neue Freigabe, wird der Abruf übersprungen und
+  im Abruf-Protokoll als „Automatisch“ vermerkt. Fehler erscheinen nur als Hinweis, ein Hinweis
+  zu neuen Buchungen nur, wenn sich etwas geändert hat. Die comdirect-PostBox bleibt außen vor.
+- Nicht in der Demo. Die Menüleiste mit Kontoständen der Mac-App gibt es unter Linux nicht.
+
+### FinTS-Produkt-ID nur noch optional (#842, #865, #789)
+
+- Die eigene FinTS-Produktregistrierung wird beim Hinzufügen einer Bank, im Dialog „… einrichten“
+  und in der Seitenleiste nie mehr als fehlend gemeldet und blockiert „Speichern & abrufen“ nicht.
+- Fehlt beim Abruf trotzdem eine Registrierung, wechselt GiroCrab auf die eingebaute und ruft
+  einmal neu ab. Ohne eingebaute Registrierung erscheint „Diese Version enthält keine
+  FinTS-Registrierung von GiroCrab. Tragen Sie Ihre eigene Registrierung ein.“ mit
+  **Eigene Registrierung eintragen …**.
+- **Eigene Registrierung eintragen …** stellt erst auf die eigene Registrierung um, wenn eine
+  gespeichert ist, und setzt den Cursor in das Feld unter Einstellungen › Banken.
+
 ### Offline-Konten mit manuellen Buchungen (#679, #81)
 
 - **Neues Offline-Konto …** (Ablage, „+“ der Seitenleiste, Befehlspalette): ein Bargeld-Konto ohne
