@@ -199,10 +199,12 @@ QtObject {
     property string customPeriodFrom: ""
     property string customPeriodTo: ""
     property string statusFilter: "all"        // all | new | checked
-    // the sidebar's category sums follow status and direction (#621)
-    onStatusFilterChanged: { listLimit = defaultListLimit; reloadBookings(); reloadCategories() }
+    // the sidebar's category sums follow status and direction (#621); „Filter zurücksetzen“ reloads once (#840)
+    onStatusFilterChanged: if (!ListFilters.suspendsReloads) { listLimit = defaultListLimit; reloadAfterFilterChange() }
     property string directionFilter: "All"     // BookingDirection
-    onDirectionFilterChanged: { listLimit = defaultListLimit; reloadBookings(); reloadCategories() }
+    onDirectionFilterChanged: if (!ListFilters.suspendsReloads) { listLimit = defaultListLimit; reloadAfterFilterChange() }
+    /// AppModel.swift › reloadAfterFilterChange: the list and the sidebar sums (#621, #357).
+    function reloadAfterFilterChange() { reloadBookings(); reloadCategories() }
     property string searchText: ""
     property Timer searchTimer: Timer { interval: 250; onTriggered: model.reloadBookings() }
     onSearchTextChanged: searchTimer.restart()
@@ -516,8 +518,8 @@ QtObject {
         vaultLoaded = false
         hasOwnVault = false
         demoActive = false
-        groups = []; userGroups = []; accountsByID = ({}); accountMarkers = ({}); bookings = []; categories = []; categoryTree = []
-        connections = []; page = null; merchantStats = null; merchantAccountStats = null; streamItems = []; streamModel.clear(); dayGroups = []; history = []
+        groups = []; userGroups = []; accountsByID = ({}); accountMarkers = ({}); bookings = []; categories = []; categoryTree = []; uncategorizedFilteredCount = null
+        connections = []; page = null; ListBalances.clear(); merchantStats = null; merchantAccountStats = null; streamItems = []; streamModel.clear(); dayGroups = []; history = []
         rules = []; settings = []; dashboard = null; budgets = []; recurring = []; recurringMonth = null; recurringHidden = []
         selectedBookingID = null; stickyBooking = null; salaryCycle = null
         ++loanGeneration; loans = []; loanLinks = ({}); loanEditor = null; openingBalanceRequest = null
@@ -617,20 +619,39 @@ QtObject {
         if (!isUnlocked || selectionLoadTakes("categories")) return
         loadOffMain("categories", () => {
             const r = periodRange()
-            return [categoriesCall(r)]
-        }, r => applyCategories(r[0]))
+            const calls = [categoriesCall(r)]
+            const count = uncategorizedCountCall()
+            if (count) calls.push(count)
+            return { calls: calls, ctx: count !== null }
+        }, (r, counted) => applyCategories(r[0], counted ? r[1] : null))
     }
-    /// AppModel+Loading.swift › listCategoriesFiltered: the sidebar sums for the period `r`, narrowed
-    /// like the booking list (categorySumFilter, #621); built when the load starts (current filters).
+    /// AppModel+Loading.swift › listCategoriesFilteredAmount: the sidebar sums for the period `r`, narrowed
+    /// like the booking list (categorySumFilter, #621, #357); built when the load starts (current filters).
     function categoriesCall(r) {
         const f = categorySumFilter()
-        return ["list_categories_filtered", { date_from: r[0], date_to: r[1], account_ids: f.accounts, checked: f.checked,
-                                              direction: f.direction }]
+        return ["list_categories_filtered_amount", { date_from: r[0], date_to: r[1], account_ids: f.accounts, checked: f.checked,
+                                                     direction: f.direction, amount_min_cents: f.amountMin, amount_max_cents: f.amountMax }]
     }
-    function applyCategories(list) {
+    /// uncategorizedCountFilter (#357): the query behind the filtered „Ohne Kategorie“ badge; null while
+    /// no filter narrows the sums (the accounts' own counts apply). Not tied to the period.
+    function uncategorizedCountCall() {
+        const f = categorySumFilter()
+        if (!f.accounts.length && f.checked === null && f.direction === "All" && f.amountMin === null && f.amountMax === null) return null
+        const accounts = f.accounts.length ? f.accounts : allAccounts.filter(a => a.kind !== "Loan").map(a => a.id)
+        return ["count_transactions", { filter: {
+            account_ids: accounts, category_id: null, include_subcategories: true, uncategorized_only: true,
+            search: null, date_from: null, date_to: null, limit: 1, offset: 0, scope: "All",
+            merchant_key: null, direction: f.direction, checked: f.checked, whole_days: false,
+            amount_min_cents: f.amountMin, amount_max_cents: f.amountMax } }]
+    }
+    /// `count`: the filtered „Ohne Kategorie“ badge, null = the accounts' own counts.
+    function applyCategories(list, count) {
         categories = list
+        uncategorizedFilteredCount = count === undefined ? null : count
         categoryTree = buildTree(list)
     }
+    /// AppModel.swift › uncategorizedFilteredCount: „Ohne Kategorie“ badge while list filters narrow the sums (#357).
+    property var uncategorizedFilteredCount: null
     /// Category tree from the flat list in one pass (grouped by parent first; the
     /// former per-node filter was quadratic and slow with large MoneyMoney imports).
     /// Order within a level stays the order of `flat`.
@@ -658,9 +679,9 @@ QtObject {
         reloadCategoryHistory()
         dropPendingPage()
         loadOffMain("bookings", () => {
-            const f = currentFilter()
+            const f = ListBalances.listFilter()
             const calls = [["list_transactions", { filter: f }]]
-            const flowInPage = listHasFlow(f)
+            const flowInPage = listHasFlow(f) || kpiFollowsList
             if (!flowInPage) calls.push(selectionFlowCall(f))
             return { calls: calls, ctx: { flowInPage: flowInPage } }
         }, (r, ctx) => {
@@ -691,7 +712,11 @@ QtObject {
     function listHasFlow(f) {
         return f.search === null && f.checked === null && f.direction === "All" && f.scope === "All"
             && f.category_id === null && !f.uncategorized_only && !(f.tag_ids || []).length && !f.untagged_only
+            && f.amount_min_cents === null && f.amount_max_cents === null
     }
+    /// AppModel+Loading.swift › kpiFollowsList (#357): the tiles of a category view count what the
+    /// list shows (category and every list filter); elsewhere they sum the whole selection and period.
+    readonly property bool kpiFollowsList: sidebarSelection.startsWith("category:") || sidebarSelection === "uncategorized"
     function selectionFlowCall(f) {
         const r = periodRange()
         return ["selection_flow", { account_ids: f.account_ids, date_from: r[0], date_to: r[1] }]
@@ -706,6 +731,7 @@ QtObject {
         listGeneration++
         isLoadingMoreBookings = false
         page = p
+        ListBalances.reset(p)   // running balances (#577)
         bookings = keepingLingeringRow(p.transactions)
         const sticky = stickyBooking !== null && stickyBooking.id === selectedBookingID
         if (selectedBookingID !== null && !sticky && !bookings.some(b => b.id === selectedBookingID))
@@ -813,7 +839,7 @@ QtObject {
     readonly property int remainingBookingCount: page ? Math.max(0, page.total_count - bookings.length) : 0
     function loadMoreBookings(count) {
         if (!isUnlocked || !hasMoreBookings || isLoadingMoreBookings || selectionLoadRunning) return
-        const f = currentFilter()
+        const f = ListBalances.listFilter()
         f.offset = bookings.length
         f.limit = count > 0 ? count : defaultListLimit
         const generation = listGeneration
@@ -822,6 +848,7 @@ QtObject {
             if (generation !== listGeneration) return
             isLoadingMoreBookings = false
             if (!next.transactions.length) return
+            ListBalances.merge(next)
             bookings = bookings.concat(next.transactions)
             listLimit = bookings.length
             rebuildStream()
@@ -1023,20 +1050,22 @@ QtObject {
     }
     function loadSelectionData(withCycle) {
         loadOffMain("selectionData", () => {
-            const f = currentFilter(), r = periodRange(), h = historyRequest()
+            const f = ListBalances.listFilter(), r = periodRange(), h = historyRequest()
             const parts = { recurring: selectionNeeds.recurring, categories: selectionNeeds.categories }
             const calls = []
             if (withCycle) calls.push(["salary_cycle", { account_ids: selectionAccountIDs() }])
             calls.push(["list_transactions", { filter: f }])
-            const flowInPage = listHasFlow(f)
+            const flowInPage = listHasFlow(f) || kpiFollowsList
             if (!flowInPage) calls.push(selectionFlowCall(f))
             if (parts.recurring) calls.push(recurringCall())
             if (parts.categories) calls.push(categoriesCall(r))
+            const uncategorized = parts.categories ? uncategorizedCountCall() : null
+            if (uncategorized) calls.push(uncategorized)
             calls.push(["balance_history", { account_ids: h.ids, days: h.days }])
             const categoryChart = categoryHistoryCall()
             if (categoryChart) calls.push(categoryChart)
             return { calls: calls, ctx: { withCycle: withCycle, flowInPage: flowInPage, parts: parts, range: r,
-                                          categoryChart: categoryChart !== null } }
+                                          uncategorized: uncategorized !== null, categoryChart: categoryChart !== null } }
         }, (res, ctx) => {
             let i = 0
             if (ctx.withCycle) salaryCycle = res[i++]
@@ -1044,13 +1073,14 @@ QtObject {
             const flow = ctx.flowInPage ? null : res[i++]
             const rec = ctx.parts.recurring ? res[i++] : null
             const cats = ctx.parts.categories ? res[i++] : null
+            const uncategorized = ctx.uncategorized ? res[i++] : null
             const pts = res[i++]
             const categorySums = ctx.categoryChart ? res[i++] : []
             endSelectionLoad()
             publish(page)
             applySelectionFlow(page, flow)
             if (rec) { applyRecurring(rec); selectionNeeds.recurring = false }
-            if (cats) { applyCategories(cats); selectionNeeds.categories = false }
+            if (cats) { applyCategories(cats, uncategorized); selectionNeeds.categories = false }
             history = trimHistory(pts, ctx.range)
             categoryHistory = categorySums
             if (selectFirstBookingOnLoad) {
@@ -1072,6 +1102,7 @@ QtObject {
     /// them anew after the load would block the GUI thread far longer than the load.
     function showSelectionPlaceholder() {
         isLoadingSelection = true
+        ListBalances.clear()
         history = []
         categoryHistory = []
     }
@@ -1110,14 +1141,30 @@ QtObject {
         if (sel.startsWith("userGroup:")) return userGroupAccountIDs(sel.slice(10))
         return []
     }
-    // MARK: category views narrowed to accounts (AppModel+Loading.swift, #406)
-    /// AppModel.swift › categoryAccountFilter: accounts whose bookings the category views show
-    /// („Ohne Kategorie“ and a category) as `{ id: true }`; empty = all. Kept while the app runs.
+    // MARK: list narrowed to accounts (AppModel+Loading.swift, #406, #357)
+    /// AppModel.swift › categoryAccountFilter: accounts whose bookings the list shows in the category
+    /// views („Ohne Kategorie“ and a category, #406), in „Alle Konten“, account groups and „Neue Umsätze“
+    /// (#357) as `{ id: true }`; empty = all. Kept while the app runs.
     property var categoryAccountFilter: ({})
+    /// The category views narrow the sidebar's sums to the chosen accounts too (#406).
     readonly property bool showsCategoryAccountFilter: sidebarSelection.startsWith("category:") || sidebarSelection === "uncategorized"
-    /// The chosen accounts that still exist, in sidebar order; empty = all accounts.
+    /// showsAccountFilter (#357): the category views, „Alle Konten“, account groups and „Neue Umsätze“.
+    /// A single account has nothing to choose from.
+    readonly property bool showsAccountFilter: {
+        const s = sidebarSelection
+        return showsCategoryAccountFilter || s === "all" || s === "newBookings"
+            || s.startsWith("group:") || s.startsWith("bank:") || s.startsWith("userGroup:")
+    }
+    /// accountFilterCandidates: the accounts the filter chooses from – those of the selected group, otherwise all.
+    readonly property var accountFilterCandidates: {
+        const s = sidebarSelection
+        if (!(s.startsWith("group:") || s.startsWith("bank:") || s.startsWith("userGroup:"))) return allAccounts
+        const ids = selectionAccountIDs()
+        return allAccounts.filter(a => ids.indexOf(a.id) >= 0)
+    }
+    /// The chosen accounts that still exist and belong to the selection, in sidebar order; empty = all of them.
     readonly property var categoryAccountIDs: Object.keys(categoryAccountFilter).length
-        ? allAccounts.map(a => a.id).filter(id => categoryAccountFilter[id]) : []
+        ? accountFilterCandidates.map(a => a.id).filter(id => categoryAccountFilter[id]) : []
     function setCategoryAccountFilter(ids) {
         const next = {}
         for (const id of ids) next[id] = true
@@ -1125,7 +1172,7 @@ QtObject {
             && Object.keys(next).every(k => categoryAccountFilter[k])
         if (same) return
         categoryAccountFilter = next
-        if (!showsCategoryAccountFilter) return
+        if (!showsAccountFilter) return
         listLimit = defaultListLimit
         requestSelectionLoad({ categories: true })   // also the sidebar sums (#621)
     }
@@ -1134,14 +1181,15 @@ QtObject {
         const next = categoryAccountIDs.slice()
         const at = next.indexOf(id)
         if (at >= 0) next.splice(at, 1); else next.push(id)
-        setCategoryAccountFilter(next.length === allAccounts.length ? [] : next)
+        setCategoryAccountFilter(next.length === accountFilterCandidates.length ? [] : next)
     }
     /// AppModel+Loading.swift › categorySumFilter: what the sidebar's category sums count besides the
-    /// period (#621): the same accounts (only in the category views, where the list offers that filter)
-    /// and status as the booking list.
+    /// period (#621): the same status, type and amount range as the booking list (#357), and its accounts
+    /// only in the category views (#406).
     function categorySumFilter() {
         return { accounts: showsCategoryAccountFilter ? categoryAccountIDs : [],
-                 checked: statusFilter === "all" ? null : statusFilter === "checked", direction: directionFilter }
+                 checked: statusFilter === "all" ? null : statusFilter === "checked", direction: directionFilter,
+                 amountMin: ListFilters.amountMin, amountMax: ListFilters.amountMax }
     }
     /// AppModel+Loading.swift › categorySumNote: hint under the sidebar's „Kategorien“ heading while a
     /// filter narrows the sums; "" = none. Names no account (the sidebar is part of bug report screenshots).
@@ -1149,6 +1197,7 @@ QtObject {
         const parts = []
         if (statusFilter !== "all") parts.push(qsTr("Status: %1").arg(titleOf(statusFilters, statusFilter)))
         if (directionFilter !== "All") parts.push(directionFilter === "Income" ? qsTr("Einnahmen") : qsTr("Ausgaben"))
+        if (ListFilters.amountActive) parts.push(qsTr("Betrag"))
         const chosen = showsCategoryAccountFilter ? categoryAccountIDs.length : 0
         if (chosen > 0) parts.push(qsTr("Konten: %1 von %2").arg(chosen).arg(allAccounts.length))
         return parts.length ? qsTr("Summen gefiltert – %1").arg(parts.join(" · ")) : ""
@@ -1158,7 +1207,7 @@ QtObject {
     onShowsCategoryAccountFilterChanged: if (categoryAccountIDs.length) reloadCategories()
     /// Label of the account menu; never names an account (the header is part of bug report screenshots).
     readonly property string categoryAccountFilterTitle: categoryAccountIDs.length === 0
-        ? qsTr("Konten: Alle") : qsTr("Konten: %1 von %2").arg(categoryAccountIDs.length).arg(allAccounts.length)
+        ? qsTr("Konten: Alle") : qsTr("Konten: %1 von %2").arg(categoryAccountIDs.length).arg(accountFilterCandidates.length)
 
     // MARK: period per category (AppModel+Selection.swift, AppModelTypes.swift › Period.storageKey, #425)
     /// Relative, launch-independent form: "this year" stays "this year" next January. null for custom.
@@ -1202,19 +1251,23 @@ QtObject {
     function choosePeriod(p) {
         period = p
         if (sidebarSelection.startsWith("category:")) setCategoryPeriod(p, Number(sidebarSelection.slice(9)))
+        ListFilters.rememberPeriod()   // restored on the next launch (#840)
     }
 
     function currentFilter() {
         const r = periodRange()
         const sel = sidebarSelection
-        // „Neue Umsätze“: everything new, whatever the list filters say elsewhere.
+        // Chosen accounts (#357); within a group they narrow its accounts, empty = all of them.
+        const chosen = categoryAccountIDs
+        // „Neue Umsätze“: everything new, whatever the other list filters say; only the account and
+        // amount filters narrow it.
         if (sel === "newBookings")
-            return { account_ids: [], category_id: null, include_subcategories: true, uncategorized_only: false,
+            return ListFilters.applyTo({ account_ids: chosen, category_id: null, include_subcategories: true, uncategorized_only: false,
                      search: null, date_from: null, date_to: null, limit: listLimit, offset: 0, scope: "All",
-                     merchant_key: null, direction: "All", checked: false, whole_days: true }
-        return TagFilter.applyTo({   // + the tag filter (#228)
-            // AppModel+Loading.swift › currentFilter: the category views follow the account menu (#406)
-            account_ids: showsCategoryAccountFilter ? categoryAccountIDs : selectionAccountIDs(),
+                     merchant_key: null, direction: "All", checked: false, whole_days: true })
+        return ListFilters.applyTo(TagFilter.applyTo({   // + the tag filter (#228) and the amount range (#357)
+            // AppModel+Loading.swift › currentFilter: the account menu (#406, #357)
+            account_ids: showsAccountFilter && chosen.length ? chosen : selectionAccountIDs(),
             category_id: sel.startsWith("category:") ? Number(sel.slice(9)) : null,
             include_subcategories: true,
             uncategorized_only: sel === "uncategorized",
@@ -1226,7 +1279,7 @@ QtObject {
             direction: directionFilter,
             checked: statusFilter === "all" ? null : statusFilter === "checked",
             whole_days: true
-        })
+        }))
     }
 
     // MARK: user groups (AccountGroupsModel.swift)
@@ -1294,9 +1347,31 @@ QtObject {
     }
     /// Shown while searching: its name matches, or a listed account lives in it or a subgroup.
     function isUserGroupListed(g) {
-        if (!isSidebarAccountSearching) return isUserGroupVisible(g)
+        if (!isSidebarAccountSearching) return isUserGroupVisible(g) && !isUserGroupHiddenAsArchived(g)
         return userGroupSubtree(g.uuid).some(n => sidebarTextMatches(n.name, sidebarAccountSearch)
                                                   || n.accounts.some(a => isSidebarAccountListed(a)))
+    }
+    /// isSidebarSectionListed (#814): a kind or bank section is shown while searching only with a hit;
+    /// otherwise it stays unless archived accounts are hidden and it holds nothing but archived
+    /// accounts. A section without accounts stays.
+    function isSidebarSectionListed(accounts) {
+        const listed = accounts.some(a => isSidebarAccountListed(a))
+        if (isSidebarAccountSearching) return listed
+        return listed || !accounts.length || showArchivedAccounts
+    }
+    /// isUserGroupOnlyArchived (#814): archived accounts are hidden and this group (with its subgroups)
+    /// holds accounts, all of them archived. A group without accounts stays.
+    function isUserGroupOnlyArchived(g) {
+        if (showArchivedAccounts) return false
+        const accounts = [].concat(...userGroupSubtree(g.uuid).map(n => n.accounts))
+        return accounts.length > 0 && accounts.every(a => a.archived_unix !== null)
+    }
+    /// The group or any group above it holds only archived accounts: a subgroup never stays behind
+    /// under a hidden parent.
+    function isUserGroupHiddenAsArchived(g) {
+        for (let n = g; n; n = n.parent_uuid ? userGroups.find(x => x.uuid === n.parent_uuid) : null)
+            if (isUserGroupOnlyArchived(n)) return true
+        return false
     }
     function isKindGroupOpen(id) { return isSidebarAccountSearching || !collapsedGroups[id] }
     function isBankGroupOpen(key) { return isSidebarAccountSearching || !collapsedBankGroups[key] }
@@ -1388,7 +1463,10 @@ QtObject {
     readonly property var liquidAccounts: allAccounts.filter(a => a.in_total && ["Checking", "Savings", "PaymentService", "CreditCard", "Cash"].indexOf(a.kind) >= 0)
     readonly property int liquidBalance: liquidAccounts.reduce((s, a) => s + a.balance_cents, 0)
     readonly property int newCount: allAccounts.reduce((s, a) => s + a.new_count, 0)
-    readonly property int uncategorizedCount: allAccounts.filter(a => a.kind !== "Loan").reduce((s, a) => s + a.uncategorized_count, 0)
+    /// Bookings without a category (badge of „Ohne Kategorie“): all of them, or, while list filters
+    /// narrow the sums, those matching the filters (#357). Not tied to the period.
+    readonly property int uncategorizedCount: uncategorizedFilteredCount !== null ? uncategorizedFilteredCount
+        : allAccounts.filter(a => a.kind !== "Loan").reduce((s, a) => s + a.uncategorized_count, 0)
     readonly property real consumptionThisMonth: selectionFlow ? selectionFlow.consumption : 0
     readonly property real investedThisMonth: selectionFlow ? selectionFlow.invested : 0
     readonly property real incomeThisMonth: selectionFlow ? selectionFlow.income : 0
@@ -1444,6 +1522,9 @@ QtObject {
     }
     readonly property var headerBalanceUnsplit: {
         const sel = sidebarSelection
+        // A group's or all accounts' total covers every account: no figure while accounts are filtered (#357).
+        if ((sel === "all" || sel.startsWith("group:") || sel.startsWith("bank:") || sel.startsWith("userGroup:"))
+                && categoryAccountIDs.length) return null
         if (sel === "all") return { label: qsTr("Verfügbar (Giro, Tagesgeld, Karten)"), cents: liquidBalance }
         if (sel.startsWith("account:")) { const a = accountsByID[Number(sel.slice(8))]; return a ? { label: isTangible(a.id) ? qsTr("Wert heute") : DepotState.depotKind(a.id) === "securities" ? qsTr("Depotwert") : qsTr("Kontostand"), cents: a.balance_cents } : null }
         if (sel.startsWith("group:")) { const g = groups.find(g => "group:" + g.id === sel); return g ? { label: qsTr("Summe"), cents: g.balance_cents } : null }
@@ -3688,6 +3769,9 @@ QtObject {
         const d = periodRange(previousMonthPeriod())
         customPeriodFrom = String(defaults.value("period/customFrom", "")) || d[0]
         customPeriodTo = String(defaults.value("period/customTo", "")) || d[1]
+        // The last chosen period (#840); no vault yet, so its reload is a no-op. Demo starts keep
+        // „Gesamter Zeitraum“ for reproducible screenshots.
+        if (!optionDemoSeed) { const saved = ListFilters.storedPeriod(); if (saved !== null) period = saved }
     }
     /// Switches to the user-defined period; swaps the dates if needed (ISO strings).
     function applyCustomPeriod(from, to) {
@@ -3697,6 +3781,7 @@ QtObject {
         defaults.setValue("period/customFrom", a)
         defaults.setValue("period/customTo", b)
         if (period === "custom") { listLimit = defaultListLimit; reloadSelection(true) } else period = "custom"
+        ListFilters.rememberPeriod()
     }
 
     // FinTS product registration (GiroCrab's own vs. the user's).

@@ -94,6 +94,36 @@ Funktionsumfang der Oberfläche.
 - Die Skripte im Browser sind die der Mac-App (`scripts/gen-equateplus-qml.py`, abgeglichen von
   `scripts/test-equateplus-linux.cjs`). Mit einem echten EquatePlus-Zugang noch nicht getestet.
 
+### Buchungsliste: Filter, Saldo, Auswahlsumme
+
+- **Nach Betrag filtern (#357):** In der Filterzeile öffnet **„Betrag“** ein Fenster mit „Von“
+  und „Bis“ („Betrag ohne Vorzeichen.“, leer = offen); die Pille zeigt dann den Bereich, das
+  Kreuz daneben setzt ihn zurück („Betragsfilter zurücksetzen“). Liste, Anzahl, Summen der
+  Seitenleiste („Summen gefiltert – Betrag“), das Kennzeichen „Ohne Kategorie“ und der Export
+  folgen dem Filter.
+- **Kontenfilter überall (#357):** Das Menü „Konten: Alle“ steht jetzt auch in „Alle Konten“, in
+  Gruppen, Banken und Kontoarten (Auswahl aus deren Konten) und in „Neue Umsätze“. Solange Konten
+  gewählt sind, zeigt der Kopf einer Gruppe keine Summe. In den Kategorieansichten zählen die
+  Kacheln, was die Liste zeigt.
+- **„Filter zurücksetzen“ (#840):** Der Knopf in der Filterzeile setzt Status, Buchungsart, Tags,
+  Konten, Betrag und Suche mit einem Neuladen zurück; der Zeitraum bleibt.
+- **Zeitraum über Neustarts (#840):** Der zuletzt gewählte Zeitraum wird beim Start
+  wiederhergestellt (QSettings `period/last`); Demo-Starts bleiben bei „Gesamter Zeitraum“.
+- **Mitlaufender Saldo (#577):** Darstellung › **„Saldo anzeigen“** bzw. Einstellungen ›
+  Allgemein › „Saldo in der Buchungsliste anzeigen“ (aus ab Werk): Kontostand nach jeder Buchung
+  unter dem Betrag (Kompakt: daneben) und „Saldo …“ am Ende jedes Tages im Tageskopf. Nur bei
+  einem Konto, einer Gruppe oder „Alle Konten“, bei mehreren Konten die Summe der Euro-Konten.
+  Der CSV-Export hat unter „Weitere Optionen“ die „Saldo-Spalte (nach jeder Buchung)“.
+- **Auswahlsumme (#878):** Bei mehreren markierten Buchungen zeigt eine Leiste unter der Liste
+  „%1 Buchungen ausgewählt“ und die Summe, je Währung eine.
+- **Letzter Abruf (#815):** Darstellung bzw. Einstellungen › „Letzten Abruf anzeigen“ (aus ab
+  Werk) zeigt unter dem Kontostand eines Kontos „Abgerufen vor …“ (Tooltip: Datum und Uhrzeit)
+  oder „Noch nie abgerufen“; nicht bei Offline-Konten.
+- **Archivierte Konten (#814):** Sind archivierte Konten ausgeblendet, verschwinden auch Gruppen,
+  Banken und Kontoarten, die nur archivierte Konten enthalten.
+- Wenn die Filterzeile nicht in den Kopf passt, lässt sie sich seitlich verschieben, statt
+  abgeschnitten zu werden.
+
 ### Kleinere Punkte
 
 - **Kategoriesummen folgen den Filtern (#621):** Die Summen unter „Kategorien“ in der
