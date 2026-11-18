@@ -10,6 +10,29 @@ Funktionsumfang der Oberfläche.
 
 ## Funktionsstand 0.8.0 (in Arbeit)
 
+### Advanzia-Karten (#935)
+
+- **Bank hinzufügen › „Advanzia Bank (Zugang mein.advanzia.com)“:** Abruf im Browserfenster. Sie
+  melden sich bei Advanzia an und bestätigen dort mit dem SMS-Code oder in der Advanzia-App; der
+  Kopf des Fensters zeigt, welcher Schritt gerade ansteht. Danach erkennt GiroCrab die Karte und
+  übernimmt Umsätze und Kontostand von selbst. Beim ersten Abruf wählen Sie einmal das Zielkonto
+  (neues Kreditkartenkonto oder ein vorhandenes).
+- Jeder Advanzia-Zugang hat seine eigene Sitzung; **Bankzugang bearbeiten › „Web-Sitzung löschen …“**
+  verwirft sie.
+- **Abweichung von der Mac-App:** Unter Linux trägt GiroCrab keine gespeicherten Anmeldedaten
+  automatisch ein. Es gibt kein gespeichertes Advanzia-Passwort, keine automatische Wahl des
+  Freigabeverfahrens und keine Übermittlung des SMS-Codes aus einem eigenen Dialog – Passwort und
+  Code geben Sie im Fenster der Bank selbst ein.
+
+### Amex: Partnerkarten und Kartenauswahl (#243)
+
+- Mehrere Karten eines Amex-Logins: Das Portal-Fenster öffnet jede Karte der Kartenauswahl einmal
+  („Karten werden geladen …“, „Umsätze übernehmen“ ist so lange gesperrt). Jede Karte wird ein
+  eigenes Konto; vorhandene Konten mit denselben Endziffern werden weiterverwendet.
+- Neue Karten fragt **„Welche Karten sollen abgerufen werden?“**; nicht gewählte werden übersprungen.
+- **Abweichung von der Mac-App:** Die gespeicherte Anmeldung (Benutzername und Passwort im Tresor,
+  ins Anmeldeformular eingetragen) gibt es unter Linux nicht. Sie melden sich im Fenster selbst an.
+
 ### Offline-Konten mit manuellen Buchungen (#679, #81)
 
 - **Neues Offline-Konto …** (Ablage, „+“ der Seitenleiste, Befehlspalette): ein Bargeld-Konto ohne
