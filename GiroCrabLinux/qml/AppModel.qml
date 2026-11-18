@@ -1965,7 +1965,6 @@ QtObject {
         if (statementsAccountID !== null && (!accountsByID[statementsAccountID] || accountsByID[statementsAccountID].connection_id !== connection.id)
             || quietSyncConnectionID === connection.id)
             statementsAccountID = null
-            postboxConnectionID = null
         const statementsFor = statementsAccountID
         // "PostBox jetzt abrufen" (#838) only for exactly this login, never in an automatic sync
         if (postboxConnectionID !== connection.id || quietSyncConnectionID === connection.id) postboxConnectionID = null
