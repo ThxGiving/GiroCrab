@@ -67,6 +67,27 @@ Funktionsumfang der Oberfläche.
 - **Tags verwalten:** Die Buchungszahl eines Tags zeigt beim Darüberfahren oder per Klick die
   **Buchungen nach Konten**; ein Klick auf ein Konto zeigt dessen Buchungen mit diesem Tag in der
   Liste.
+- **Regeln vergeben Tags (#580):** Im Regel-Editor gibt es das Feld **„Tags“** („Tag hinzufügen“,
+  auch „Neuer Tag …“) und als Kategorie **„Keine (nur Tags)“**. Ohne Kategorie und ohne Tag lässt
+  sich eine Regel nicht speichern („Die Regel braucht eine Kategorie oder mindestens einen Tag.“).
+  Tags werden nur hinzugefügt, nie entfernt; jede passende Regel gibt ihre Tags dazu. Die
+  Regelliste nennt die Tags einer Regel und zählt „8“, „1 | 3“ oder „– | 2“ (Tooltip „Von dieser
+  Regel kategorisiert“ / „Passend und mit ihren Tags“); die Live-Vorschau einer reinen Tag-Regel
+  zeigt keine Hand mehr bei von Hand kategorisierten Buchungen.
+- **Tags verwalten:** neue Spalte **„Regeln“** (Tooltip nennt die Regeln) und das Häkchen
+  **„Ohne Regel“** („Nur Tags zeigen, die noch keine Regel vergibt“).
+
+### Kategorie-Vorschläge (#664)
+
+- Eine Buchung ohne Kategorie bekommt in ihrer Kategorie-Karte den **„Vorschlag (aus Historie)“**:
+  die Kategorie früherer Buchungen an dieselbe IBAN, beim selben Händler oder – wenn der Händler
+  noch keine Historie hat – mit ähnlichem Buchungstext, mit Begründung („Wie alle 4 Buchungen bei
+  diesem Händler“). **Übernehmen** setzt sie, **Als Regel …** öffnet den Regel-Editor damit
+  (bei IBAN-Grundlage als IBAN-Regel).
+- In der Buchungsliste steht der Vorschlag blass neben „Ohne Kategorie“; das Zeilenmenü bietet
+  unter *Kategorie* „Vorschlag übernehmen: …“.
+- Alles wird auf dem Gerät berechnet, im Hintergrund geladen und nicht gespeichert; ein Vorschlag
+  zählt in keiner Summe, bis Sie ihn übernehmen.
 
 ### Depot und Sachwerte (#564, #625)
 
