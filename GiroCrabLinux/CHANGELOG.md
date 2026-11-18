@@ -10,6 +10,19 @@ Funktionsumfang der Oberfläche.
 
 ## Funktionsstand 0.8.0 (in Arbeit)
 
+### Offline-Konten mit manuellen Buchungen (#679, #81)
+
+- **Neues Offline-Konto …** (Ablage, „+“ der Seitenleiste, Befehlspalette): ein Bargeld-Konto ohne
+  Bankanbindung mit Startsaldo und Konto-Notiz. Es entsteht immer im eigenen Tresor.
+- **Buchung › Neue Buchung …** (Strg+Alt+N, auch „+“ in der Symbolleiste): Datum, Ausgabe oder
+  Einnahme, Betrag, Name, Verwendungszweck, Kategorie und Notiz. **Buchung bearbeiten …** und
+  **Buchung löschen …** im Menü Buchung und im Kontextmenü der Buchung.
+- Kontextmenü einer Buchung: **In Offline-Konto spiegeln** (Kopie mit umgekehrtem Betrag, z. B.
+  eine Abhebung am Geldautomaten als Bargeld-Einzahlung). Kontextmenü des Kontos: **Neue Buchung …**
+  und **Saldo korrigieren …** (legt eine Korrekturbuchung an).
+- Die Seitenleiste zeigt die Konto-Notiz unter dem Kontonamen; für Offline-Konten entfällt
+  „Kontoart ändern …“.
+
 ### Privatmodus (#719)
 
 - **Darstellung › Privatmodus** (Strg+Umschalt+H) und das **Auge in der Symbolleiste** blenden

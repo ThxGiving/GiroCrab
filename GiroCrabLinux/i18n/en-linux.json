@@ -140,6 +140,7 @@
   "MoneyMoney-Export (*.csv *.xml *.sta *.mt940 *.txt)": "MoneyMoney export (*.csv *.xml *.sta *.mt940 *.txt)",
   "MoneyMoney-Export auswählen": "Choose MoneyMoney Export",
   "Nach Name": "By Name",
+  "Neue Buchung (Strg+Alt+N)": "New booking (Ctrl+Alt+N)",
   "Neue Namen, Farben und die Reihenfolge gelten, sobald Sie schließen.": "New names, colours and the order apply once you close.",
   "Neue Überweisung (Strg+N)": "New transfer (Ctrl+N)",
   "Neuer Tag": "New Tag",

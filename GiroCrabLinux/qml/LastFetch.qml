@@ -15,12 +15,8 @@ QtObject {
     readonly property bool shown: store.showLastFetch
     function setShown(on) { store.showLastFetch = on }
 
-    /// AppModel.isOffline: accounts that take manual bookings (#679) are never fetched. Re-read with
-    /// the accounts (a small indexed query).
-    readonly property var offlineIDs: {
-        if (!AppModel.isUnlocked || !AppModel.groups.length) return []
-        try { return AppModel.core("list_offline_account_ids") } catch (e) { return [] }
-    }
+    /// AppModel.isOffline: accounts that take manual bookings (#679) are never fetched (OfflineAccounts.qml).
+    readonly property var offlineIDs: OfflineAccounts.ids
 
     /// lastFetchText(for:): { text, help } of the account's bank connection, null for offline accounts.
     /// The core stores the time per connection, not per account, so accounts of one bank show the same value.
