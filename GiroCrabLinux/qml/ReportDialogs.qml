@@ -20,6 +20,13 @@ QtObject {
     function untrack(popup) {
         if (popups.indexOf(popup) >= 0) popups = popups.filter(p => p !== popup)
     }
+    /// macOS closes an open popover when the report window takes the focus, so only sheets
+    /// stay in the picture there (CLAUDE.md › Sensitive UI). Linux keeps popovers open on a
+    /// click into another window: the report closes them itself when it opens.
+    function dismissPopovers() {
+        for (const p of popups.slice())
+            if (p.sheetWidth === undefined) p.close()   // Sheet.qml has sheetWidth, popovers do not
+    }
     /// The item a popup draws into (Popup.popupItem is not exposed to QML).
     function itemOf(popup) {
         const c = popup.background || popup.contentItem

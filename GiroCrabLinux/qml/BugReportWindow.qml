@@ -68,7 +68,7 @@ ApplicationWindow {
         function onIsUnlockedChanged() { win.prepareDiagnostics() }
         function onIsDemoChanged() { win.prepareDiagnostics() }
     }
-    Component.onCompleted: { capture(); prepareDiagnostics() }
+    Component.onCompleted: { ReportDialogs.dismissPopovers(); capture(); prepareDiagnostics() }
 
     // MARK: capture (BugReport.captureMainWindow)
 

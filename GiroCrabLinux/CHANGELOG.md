@@ -25,9 +25,11 @@ Funktionsumfang der Oberfläche.
 
 ### Problem melden nimmt Dialoge mit auf (#384)
 
-- **Hilfe › Problem melden** zeichnet ein geöffnetes Sheet oder Popover an seiner Stelle in den
-  Screenshot des Hauptfensters, geschwärzt wie das Hauptfenster. Ist das Einstellungen-Fenster
-  offen, kommt es samt seinen Sheets mit ins Bild.
+- **Hilfe › Problem melden** zeichnet ein geöffnetes Sheet an seiner Stelle in den Screenshot des
+  Hauptfensters, geschwärzt wie das Hauptfenster. Ist das Einstellungen-Fenster offen, kommt es
+  samt seinen Sheets mit ins Bild (unter Wayland mittig über dem Hauptfenster, weil Wayland die
+  Fensterlage nicht verrät). Ein offenes Popover schließt sich wie in der Mac-App, sobald der
+  Bericht aufgeht.
 - Textfelder, Texteditoren, Auswahlfelder und Webseiten (Bank- und Portal-Anmeldungen) in
   Dialogen deckt die Aufnahme selbst ab.
 - Hinweise und Bestätigungsdialoge werden nicht aufgenommen; der Bericht sagt dann: „Ein
