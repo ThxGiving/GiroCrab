@@ -55,6 +55,25 @@ Funktionsumfang der Oberfläche.
   Position, wenn sie von der Kontowährung abweicht.
 - Alle Beträge, Mengen und Anteile sind im Privatmodus verdeckt, Wertpapiernamen auf Wunsch.
 
+### Wertverlauf der Depots (#578, #761)
+
+- **Wertverlauf im Depotkopf:** Statt „Bewertungsverlauf noch nicht verfügbar“ zeigt die
+  Kopfkarte eines Wertpapierdepots den Depotwert über den gewählten Zeitraum als Stufenlinie –
+  aus den Werten, die die Bank bei jedem Abruf meldet, und aus importierten Werten. Ein Wert gilt
+  bis zum nächsten; vor dem ersten bekannten Wert bleibt das Diagramm leer („Werte ab …“).
+  Beim Darüberfahren stehen Tag, Wert und die Änderung seit Beginn des Zeitraums oben links.
+- **Vermögen › Wertpapiere** zeigt denselben Verlauf für alle Depots; eine Teilsumme (nicht jedes
+  Depot hatte schon einen Wert) ist gestrichelt und als „Teilsumme · 2 von 3 Depots“ markiert,
+  Depots in anderer Währung bleiben draußen und werden genannt.
+- **„Wertverlauf anzeigen“** in der Positionstabelle (Diagramm-Knopf neben dem Stift und im
+  Kontextmenü) öffnet den Verlauf einer Position; **„Verkaufte Positionen“** unter der Tabelle
+  listet nicht mehr gehaltene Positionen mit Verlauf.
+- Die Kopfkarte von Depot und Sachwerten zeigt das Diagramm jetzt in voller Breite unter Name und
+  Wert; Sachwerte nutzen dasselbe Diagramm.
+- **„Vorhandene Daten importieren“ › Datenbank:** übernimmt den Wertverlauf der Depots und nennt die Zahl der
+  „Wertverlauf-Einträge“ in der Vorschau und in der Zusammenfassung.
+- Startoption `--demo-sheet position-history` (mit `--select` auf ein Depot) für Screenshots.
+
 ### Kopfbereich und Diagramme
 
 - **Diagramm-Steuerung unter dem Kopf-Diagramm (#634):** Ausgeblendet / Linie / Balken / Kreis
