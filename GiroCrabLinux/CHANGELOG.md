@@ -23,6 +23,25 @@ Funktionsumfang der Oberfläche.
   Privatmodus verdeckt.
 - Startoption `--privacy[=all]` für Screenshots.
 
+### Problem melden nimmt Dialoge mit auf (#384)
+
+- **Hilfe › Problem melden** zeichnet ein geöffnetes Sheet oder Popover an seiner Stelle in den
+  Screenshot des Hauptfensters, geschwärzt wie das Hauptfenster. Ist das Einstellungen-Fenster
+  offen, kommt es samt seinen Sheets mit ins Bild.
+- Textfelder, Texteditoren, Auswahlfelder und Webseiten (Bank- und Portal-Anmeldungen) in
+  Dialogen deckt die Aufnahme selbst ab.
+- Hinweise und Bestätigungsdialoge werden nicht aufgenommen; der Bericht sagt dann: „Ein
+  geöffneter Hinweis oder Bestätigungsdialog wird nicht aufgenommen; das Bild zeigt, was darunter
+  liegt.“
+- Solange der Bericht offen ist, ist „Problem melden …“ im Hilfe-Menü ausgegraut; „Neu aufnehmen“
+  aktualisiert das Bild.
+- In den Dialogen sind weitere persönliche Angaben markiert (Kontoauswahl, Dokumente, Gruppen,
+  Befehlspalette, TAN-Abfrage, Export, Importe, Empfängerüberprüfung, Druck, Regeln, Sachwerte,
+  Bankzugänge in den Einstellungen).
+- Startoption `--demo-sheet report[:<Sheet>]` für Screenshots.
+- Unter Wayland kennt GiroCrab die Lage der Fenster nicht: Das Einstellungen-Fenster steht im
+  Bild dann mittig über dem Hauptfenster.
+
 ### Tags
 
 - **Buchungen nach Tags filtern und auswerten:** In der Filterzeile über der Buchungsliste

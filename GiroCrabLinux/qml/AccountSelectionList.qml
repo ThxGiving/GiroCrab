@@ -102,15 +102,15 @@ ColumnLayout {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 2
-                Text { text: row.modelData.name; font.pixelSize: Theme.body; color: Theme.text; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: row.modelData.name; font.pixelSize: Theme.body; color: Theme.text; elide: Text.ElideRight; Layout.fillWidth: true; Sensitive {} }
                 Text { visible: text !== ""; text: list.detail(row.modelData); font.pixelSize: Theme.caption; color: Theme.secondary
-                       elide: Text.ElideRight; Layout.fillWidth: true }
+                       elide: Text.ElideRight; Layout.fillWidth: true; Sensitive {} }
                 RowLayout {
                     visible: row.modelData.pending
                     Layout.fillWidth: true
                     spacing: 4
                     SFIcon { symbol: "exclamationmark.triangle"; size: 11; color: Theme.warning; Layout.alignment: Qt.AlignTop }
-                    Text { text: qsTr("Bereits über „%1“ eingebunden").arg(row.modelData.existing_connection)
+                    Text { text: qsTr("Bereits über „%1“ eingebunden").arg(AppModel.masking(row.modelData.existing_connection))
                            font.pixelSize: Theme.caption; color: Theme.warning; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                 }
             }

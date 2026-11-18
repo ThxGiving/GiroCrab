@@ -525,9 +525,9 @@ Sheet {
                                                 ColumnLayout {
                                                     spacing: 1; Layout.fillWidth: true
                                                     Text { text: accRow.modelData.name; color: accRow.usable ? Theme.text : Theme.secondary
-                                                           font.pixelSize: Theme.body; elide: Text.ElideRight; Layout.fillWidth: true }
+                                                           font.pixelSize: Theme.body; elide: Text.ElideRight; Layout.fillWidth: true; Sensitive {} }
                                                     Text { visible: accRow.sub !== ""; text: accRow.sub; color: Theme.secondary; font.pixelSize: Theme.caption
-                                                           elide: Text.ElideRight; Layout.fillWidth: true }
+                                                           elide: Text.ElideRight; Layout.fillWidth: true; Sensitive {} }
                                                 }
                                             }
                                             function toggle() {
@@ -655,6 +655,7 @@ Sheet {
                             wrapMode: TextEdit.WrapAnywhere
                             horizontalAlignment: Text.AlignRight
                             font.family: "monospace"; font.pixelSize: Theme.caption; color: Theme.secondary
+                            Sensitive {}   // named after the account
                         }
                     }
                 }
@@ -665,6 +666,7 @@ Sheet {
     // .alert("Export fehlgeschlagen", isPresented: failure != nil)
     Sheet {
         id: failureDialog
+        reportCapturable: false   // an alert on the Mac (ReportDialogs.qml)
         sheetWidth: 420
         visible: sheet.failure !== ""
         onClosed: sheet.failure = ""

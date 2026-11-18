@@ -17,7 +17,7 @@ ColumnLayout {
         spacing: 6
         Text {
             Layout.fillWidth: true; wrapMode: Text.WordWrap
-            text: qsTr("Konten auswählen – %1").arg(panel.connection ? panel.connection.display_name : "")
+            text: qsTr("Konten auswählen – %1").arg(panel.connection ? AppModel.masking(panel.connection.display_name) : "")
             font.pixelSize: Theme.title3; font.weight: Font.Bold; color: Theme.text
         }
         Text {
