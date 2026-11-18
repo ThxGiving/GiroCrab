@@ -244,6 +244,33 @@ Funktionsumfang der Oberfläche.
 - Wenn die Filterzeile nicht in den Kopf passt, lässt sie sich seitlich verschieben, statt
   abgeschnitten zu werden.
 
+### Export, Belege und Überweisung (#831, #934, #881, #873, #879)
+
+- **Ein Exportbefehl:** Ablage › „Umsätze exportieren …“ (Strg+Umschalt+E) deckt CSV mit ab;
+  „Umsätze als CSV exportieren …“ entfällt.
+- **Kompakter Export-Dialog:** Format (PDF | CSV | CAMT.053), Zeitraum (mit „Markierte Umsätze
+  (n)“, wenn Buchungen markiert sind), Konten-Popover mit Suche und Bank-Kästchen, Umfang und
+  eingeklappte Optionen. CSV kennt zusätzlich die Spalten „IBAN der Gegenseite“ und „Tags“.
+  Zeitraum und Konten bleiben gemerkt; „Exportieren …“ fragt immer nach dem Ort, „Pro Konto eine
+  Datei“ nach einem Ordner (statt still nach Downloads zu speichern).
+- **Belege & PostBox:** Ungelesene Dokumente tragen einen Punkt und einen fetten Titel und werden
+  beim Öffnen gelesen; „Als gelesen / ungelesen markieren“, „Nur ungelesene“ und „Alle als
+  gelesen markieren“. Die Seitenleiste zählt die ungelesenen (Kontextmenü „Alle als gelesen
+  markieren“). Filter nach Typ und Jahr; „N exportieren …“ exportiert genau die gefilterte Liste,
+  bei einem gewählten Konto in einen Unterordner mit seinem Namen. „Pfad kopieren“ im
+  Kontextmenü. Die Buchungs-Detailspalte entfällt in dieser Ansicht.
+- **Überweisung übersichtlicher:** Felder mit Rahmen, keine Abschnittsüberschriften, der Zähler
+  0/140 erst ab 120 Zeichen. Ein Umschalter „Überweisung | Umbuchung | Sammelüberweisung“ (auch
+  im Sammelüberweisungs-Fenster), die Ausführung als Aufklappmenü. Bekannte Empfänger erscheinen
+  als Aufklappliste unter dem Namen (Maus, ↑/↓, Return, Esc). Eine neue Überweisung startet leer,
+  beim Sperren wird der ganze Entwurf gelöscht. Vorlage und Einfügen verlassen die Umbuchung; vom
+  Tagesgeldkonto übernehmen sie nur Betrag und Zweck. Die Prüfansicht zeigt nur „Zurück“ und
+  „Freigeben“ (Esc geht zurück zum Formular). Das Fenster folgt der Höhe des Formulars und wächst
+  innerhalb eines Schritts nur.
+- **GiroCode als Bild:** „Bild kopieren“ und „Sichern …“ (PNG) unter dem GiroCode.
+- Der Demo-Hinweis steht beim Hinzufügen einer Bank unter den Feldern statt darüber.
+- Startoptionen `--demo-sheet export` und `--demo-sheet transfer-girocode` für Screenshots.
+
 ### Kleinere Punkte
 
 - **Kategoriesummen folgen den Filtern (#621):** Die Summen unter „Kategorien“ in der
