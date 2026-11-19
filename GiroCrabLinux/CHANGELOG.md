@@ -67,6 +67,11 @@ Funktionsumfang der Oberfläche.
   Tooltip. „Bankzugang entfernen …“ steht nur noch als Mülltonne in der Liste der Bankzugänge. Die
   Kontenauswahl zeigt jedes Konto in einer Zeile, mit einem kurzen Hinweis (die lange Erklärung
   steht im Tooltip). Die BLZ erscheint nur noch bei FinTS-Zugängen, und der Dialog ist höher.
+- **Konten gleichen Namens (#954):** Haben zwei Konten denselben Namen (etwa zweimal „Konto flex“
+  verschiedener Inhaber), zeigen die Kontoauswahl in „Belege & PostBox“, die Kontozeilen der
+  Dokumente, die Seitenleiste (Untertitel zwischen Bank und Notiz) und „Konto hinzufügen“ bei den
+  Regeln den Inhaber dazu. Fehlt er oder haben beide denselben, steht dort das Ende der IBAN bzw.
+  Kontonummer („…1234“).
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
