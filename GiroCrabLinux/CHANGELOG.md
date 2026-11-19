@@ -21,6 +21,13 @@ Funktionsumfang der Oberfläche.
   Version eine FinTS-Registrierung von GiroCrab enthält, wird sie immer verwendet; das gilt auch für
   Tresore, die bisher auf „Eigene Registrierung“ standen. Eine eigene Registrierung bleibt
   gespeichert.
+- **„Alle abrufen“ läuft nach einem Fehler weiter (#1041):** Bisher beendete der erste Fehler den
+  ganzen Durchlauf. Jetzt zeigt ein fehlgeschlagener Bankzugang sofort „Abruf von „…“ fehlgeschlagen“
+  mit „Überspringen“ (weiter mit dem nächsten Zugang), „Erneut versuchen“ (danach geht es weiter) und
+  „Alle abbrechen“. Lehnt die Bank die FinTS-Registrierung ab, ersetzt deren Alternative „Erneut
+  versuchen“. Browser-Login, Einrichtungsformular und der Wechsel auf GiroCrabs Registrierung behalten
+  den Durchlauf; „Eigene Registrierung eintragen …“ beendet ihn. Der automatische Abruf wartet, solange
+  der Durchlauf nicht fertig ist. Startoption `--demo-sheet error-batch`.
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 

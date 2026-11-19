@@ -81,7 +81,7 @@ QtObject {
         // a transfer waiting for its TAN shows `activeChallenge` / `transferBusy`
         return m.isUnlocked && !m.isDemo && m.syncingConnectionID === null && m.activeChallenge === null
             && !m.transferBusy && m.pendingLogin === null && m.webLoginConnection === null
-            && m.setupRequest === null
+            && m.setupRequest === null && m.syncQueue.length === 0   // "Alle abrufen" waiting at an error (#1041)
     }
     /// autoSyncTick: starts at most one quiet sync when nothing else is going on. The
     /// connection states are read off the GUI thread, the sync runs there as well.

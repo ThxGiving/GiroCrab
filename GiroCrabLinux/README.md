@@ -255,7 +255,7 @@ cargo run -- --screenshot /tmp/a.png         # Fenster rendern, als PNG speicher
 `batch-transfer`, `batch-transfer-confirm`, `batch-transfer-scheduled`, `standing-order`, `standing-order-confirm`,
 `standing-order-delete`, `moneymoney`, `moneymoney-db`, `recurring`, `print`, `rules`, `palette` (Befehlspalette),
 `categorizer`, `payee-match`, `payee-close`, `payee-nomatch`, `error` (Abruf-Fehler mit Alternativen zur
-FinTS-Registrierung), `rule-edit`, `rule-tags` (Regel, die nur Tags vergibt), `icon-color` (Symbol & Farbe des ersten Kontos), `category` (neue Unterkategorie),
+FinTS-Registrierung), `error-batch` (Abruf-Fehler in „Alle abrufen“ mit „Überspringen“), `rule-edit`, `rule-tags` (Regel, die nur Tags vergibt), `icon-color` (Symbol & Farbe des ersten Kontos), `category` (neue Unterkategorie),
 `icon-color-category`, `asset` (neuer Sachwert), `asset-edit`, `asset-values`, `asset-quantities` (das Auto der Demo).
 Mit `report:` davor (z. B. `report:transfer`) bzw. nur `report` öffnet sich zusätzlich „Problem melden“ über dem
 Sheet bzw. der Ansicht (#384); `--screenshot` speichert dann das Berichtsfenster.
