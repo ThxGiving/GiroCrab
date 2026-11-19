@@ -2682,7 +2682,10 @@ QtObject {
         next(0)
     }
     function canFetchStatements(a) {
-        return a && a.connector && a.kind !== "Loan" && ["VolksbankKasselGoettingen", "Direkt1822", "FinTsGeneric", "Easybank", "FordMoney", "OpelDirektbank"].indexOf(a.connector) >= 0
+        if (!a || !a.connector || a.kind === "Loan") return false
+        // switched off per connection (bank connection dialog, #954): the core would refuse it
+        if (a.connection_id !== null && documentsOffConnectionIDs.indexOf(a.connection_id) >= 0) return false
+        return ["VolksbankKasselGoettingen", "Direkt1822", "FinTsGeneric", "Easybank", "FordMoney", "OpelDirektbank"].indexOf(a.connector) >= 0
     }
     function fetchStatements(a) {
         if (syncingConnectionID !== null) return
@@ -2697,6 +2700,34 @@ QtObject {
     /// comdirect via FinTS: also fetch the PostBox through comdirect's API (#838).
     function comdirectPostbox(id) { return run(() => core("comdirect_postbox_enabled", { connection_id: id })) || false }
     function setComdirectPostbox(id, on) { run(() => core("set_comdirect_postbox", { connection_id: id, enabled: on })) }
+    /// AppModel+Connections.swift (#954): the connection's bank delivers documents (the switch
+    /// „Dokumente abrufen“ is offered only then) and whether its syncs fetch them (default on).
+    function documentsFetchSupported(id) { return coreOrNull("documents_fetch_supported", { connection_id: id }) === true }
+    function documentsFetchEnabled(id) { return coreOrNull("documents_fetch_enabled", { connection_id: id }) !== false }
+    function setDocumentsFetch(id, on) {
+        run(() => core("set_documents_fetch", { connection_id: id, enabled: on }))
+        refreshDocumentsOff()
+    }
+    /// Connections whose bank delivers documents but whose retrieval is switched off. Read once on
+    /// a change of the connections and of the switch, so views never ask the core while they render.
+    property var documentsOffConnectionIDs: []
+    onConnectionsChanged: refreshDocumentsOff()
+    function refreshDocumentsOff() {
+        documentsOffConnectionIDs = isUnlocked
+            ? connections.filter(c => documentsFetchSupported(c.id) && !documentsFetchEnabled(c.id)).map(c => c.id) : []
+    }
+    /// AppModel+Documents.swift › connectionsWithDocumentsOff: for the whole list or the one
+    /// account on screen (`accountFilter`).
+    function connectionsWithDocumentsOff(accountFilter) {
+        let ids = null
+        if (accountFilter !== null && accountFilter !== undefined) {
+            if (accountFilter === documentsWithoutAccount) return []
+            const a = accountsByID[accountFilter]
+            if (!a || a.connection_id === null) return []
+            ids = [a.connection_id]
+        }
+        return connections.filter(c => (ids === null || ids.indexOf(c.id) >= 0) && documentsOffConnectionIDs.indexOf(c.id) >= 0)
+    }
     /// "PostBox jetzt abrufen": syncs the login with the PostBox, however recent the last fetch.
     function fetchComdirectPostbox(c) {
         if (syncingConnectionID !== null) return

@@ -50,6 +50,24 @@ Funktionsumfang der Oberfläche.
   Bestelldetails), „1 Bestellung gefunden“ / „%1 Bestellungen gefunden“ bzw. „Bestelldetails aus …“
   und „Abrufen stoppen“. Bisher zeigte nur eine kleine Zeile im Kopf den Fortschritt.
 
+### Bankzugang und Belege wie in der Mac-App 0.8.6
+
+- **Dokumentenabruf je Bankzugang (#954):** „Bankzugang bearbeiten“ hat im Abschnitt „Zugang“ den
+  Schalter „Dokumente abrufen“, aber nur bei Banken, die Dokumente liefern. Er ist standardmäßig an
+  und gilt mit „Speichern“. Ist er aus, lädt der Abruf keine neuen Belege, Kontoauszüge oder
+  PostBox-Dokumente; gespeicherte bleiben. „Kontoauszüge abrufen“ verschwindet für die Konten des
+  Zugangs. Bei comdirect über FinTS sind der PostBox-Schalter und „PostBox jetzt abrufen“ dann
+  deaktiviert, mit einem Hinweis. FNZ, quirion und Schwäbisch Hall zeigen im Login-Fenster keinen
+  Haken für die PDFs. Wird der Schalter wieder eingeschaltet, holen die nächsten Abrufe nach, was
+  fehlt. „Belege & PostBox“ nennt die Zugänge mit ausgeschaltetem Abruf und verlinkt
+  „Einstellungen › Banken öffnen“. Neue Kernaufrufe in `src/dispatch.rs`:
+  `documents_fetch_supported`, `documents_fetch_enabled`, `set_documents_fetch`.
+- **Kompakterer Dialog „Bankzugang bearbeiten“ (#954):** „Speichern“ ist erst nach einer Änderung
+  aktiv; vorher heißt „Abbrechen“ „Schließen“. „Speichern & abrufen“ ist ein Symbolknopf mit
+  Tooltip. „Bankzugang entfernen …“ steht nur noch als Mülltonne in der Liste der Bankzugänge. Die
+  Kontenauswahl zeigt jedes Konto in einer Zeile, mit einem kurzen Hinweis (die lange Erklärung
+  steht im Tooltip). Die BLZ erscheint nur noch bei FinTS-Zugängen, und der Dialog ist höher.
+
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
 - **Einstellungen › Analyse:** „Lesenden Zugriff für Programme auf diesem Rechner erlauben“. Programme
