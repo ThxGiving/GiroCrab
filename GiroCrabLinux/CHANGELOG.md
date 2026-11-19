@@ -8,7 +8,15 @@ Verhalten und Texte kommen dabei 1:1 aus der Mac-App, auf Deutsch und Englisch. 
 Einstellungen › Sicherheit steht deshalb „Kern-Version“: Die Nummer gehört zum Kern, nicht zum
 Funktionsumfang der Oberfläche.
 
-## Funktionsstand 0.8.0 (in Arbeit)
+## Funktionsstand 0.8.6 (in Arbeit)
+
+### Abruf und Portale wie in der Mac-App 0.8.6
+
+- **American Express (#1010):** Die Kartenrunde läuft jetzt auch im Modus „Ältere Abrechnungen“.
+  Beim ersten Abruf eines Zugangs blieb das Fenster sonst dauerhaft hinter „Karten werden geladen …“
+  gesperrt. Wird die Runde nach 90 Sekunden nicht fertig, gibt sie auf („Nicht alle Karten ließen
+  sich öffnen – übernommen werden die bisher geladenen Karten.“), und die bisher geladenen Karten
+  lassen sich übernehmen.
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
