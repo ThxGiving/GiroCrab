@@ -2531,7 +2531,7 @@ QtObject {
     /// ManualLoanAccountMenu: "Darlehen bearbeiten …" / "Stand neu setzen …" apply.
     function isEditableManualLoan(a) { return !!a && a.kind === "Loan" && manualLoan(a.id) !== null && a.archived_unix === null }
 
-    /// OpeningBalanceMenuItem: "Startsaldo …" applies to computed balances only.
+    /// AccountSettingsView › showsOpeningBalance: the Startsaldo applies to computed balances only.
     function canSetOpeningBalance(a) { return !!a && a.balance_derived && a.archived_unix === null }
     function openOpeningBalance(a) { openingBalanceRequest = { accountId: a.id } }
     /// Sets (or clears with `null`) the Startsaldo; `date` "" = all bookings. Throws on failure.
@@ -2873,7 +2873,7 @@ QtObject {
     function setAccountOwner(id, owner) {
         if (run(() => { core("set_account_owner", { account_id: id, owner: owner }); return true })) reloadAccounts()
     }
-    /// AccountGroupsModel.swift › setAccountKind ("Kontoart ändern …").
+    /// AccountGroupsModel.swift › setAccountKind (Kontoeinstellungen).
     function setAccountKind(id, kind) {
         if (run(() => { core("set_account_kind", { account_id: id, kind: kind }); return true })) { reloadAccounts(); reloadDashboard() }
     }

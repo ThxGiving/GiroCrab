@@ -10,6 +10,23 @@ Funktionsumfang der Oberfläche.
 
 ## Funktionsstand 0.8.6 (in Arbeit)
 
+### Seitenleiste wie in der Mac-App 0.8.6
+
+- **Kontoeinstellungen (#981):** Das Kontextmenü eines Kontos hat statt „Konto bearbeiten …“,
+  „Umbenennen …“, „Symbol & Farbe …“, „Kontoart ändern …“, „Kontoinhaber …“ und „Startsaldo …“
+  nur noch **„Einstellungen …“**. Der Dialog „Kontoeinstellungen“ enthält Kontoname mit Knopf für
+  Symbol & Farbe (gilt sofort), Kontoinhaber, Kontoart (nicht bei Offline-Konten, die immer Bargeld
+  sind), Startsaldo mit „Stichtag und Kalibrierung …“ (nur wenn der Kontostand aus den Buchungen
+  berechnet wird), Kontonummer, IBAN und Bank (nur Anzeige, markierbar), Konto-Notiz und „Das Konto
+  wurde aufgelöst“. Alles andere gilt erst mit „Sichern“. „Konto archivieren …“ und „Konto
+  löschen …“ bleiben im Menü. Der Hinweis in „Saldo korrigieren …“ auf „Einstellungen …“ stimmt
+  damit jetzt auch unter Linux.
+- **Kategorien per Drag & Drop (#977):** Kategorien lassen sich in der Seitenleiste ziehen wie Konten.
+  Auf der oberen Hälfte einer Zeile landet die Kategorie davor, auf der unteren dahinter bzw. bei einer
+  Hauptkategorie oder einer Zeile mit Unterkategorien darin (als letzte Unterkategorie). Eine Kategorie
+  lässt sich nicht unter sich selbst oder ihre eigenen Unterkategorien ziehen. Ohne Maus geht es über
+  „Nach oben“ / „Nach unten“ im Kontextmenü.
+
 ### Abruf und Portale wie in der Mac-App 0.8.6
 
 - **American Express (#1010):** Die Kartenrunde läuft jetzt auch im Modus „Ältere Abrechnungen“.

@@ -81,7 +81,7 @@ Card {
                     ToolTip.visible: holderHover.hovered; ToolTip.delay: 600; ToolTip.text: AppModel.masking(card.holder)
                     Sensitive {}
                 }
-                // BalanceHeaderView.swift: the account note (AccountEditSheet, #605)
+                // BalanceHeaderView.swift: the account note (AccountSettingsView, #605)
                 Text {
                     readonly property string note: card.account ? SidebarModel.accountNote(card.account.id) : ""
                     visible: note !== "" && !card.compact
