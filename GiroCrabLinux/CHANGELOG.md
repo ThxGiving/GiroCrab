@@ -10,6 +10,31 @@ Funktionsumfang der Oberfläche.
 
 ## Funktionsstand 0.8.0 (in Arbeit)
 
+### Externe Analyse: lokale Schnittstelle und MCP (#136)
+
+- **Einstellungen › Analyse:** „Lesenden Zugriff für Programme auf diesem Rechner erlauben“. Programme
+  auf demselben Rechner (eigene Auswertungen, KI-Assistenten) lesen ausgewählte Konten, Buchungen,
+  Kategorien und Summen. Sie können nichts ändern, keine Zahlungen auslösen und sehen keine
+  Zugangsdaten. Die Schnittstelle ist standardmäßig aus.
+- „Geteilte Konten“ ist eine ausdrückliche Auswahl. Unter „Geteilte Felder“ legen Sie Empfänger,
+  Verwendungszweck, IBANs/Kontonummern und Notizen fest; IBANs und Notizen sind zunächst aus.
+- Der Zugangsschlüssel wird nur einmal angezeigt; gespeichert ist nur sein Hash. Kopiert bleibt er
+  60 Sekunden in der Zwischenablage. „Zugriff widerrufen“, ein neuer Schlüssel oder das Ausschalten
+  sperren den alten sofort (#811).
+- Der Socket läuft nur, solange der eigene Tresor entsperrt ist und angezeigt wird, nie mit den
+  Demo-Daten. Beim Sperren, beim Wechsel zur Demo und beim Beenden wird er geschlossen.
+- Der Abschnitt „Für KI-Assistenten“ zeigt den Eintrag für die MCP-Konfiguration mit dem Hilfsprogramm
+  `girocrab-mcp` und bietet „Eintrag kopieren“, „Programmpfad kopieren“ und „Verbindung testen“.
+- **Abweichungen von der Mac-App:**
+  - Der Socket liegt in `$XDG_RUNTIME_DIR/girocrab/girocrab.sock`, unter Flatpak in
+    `$XDG_RUNTIME_DIR/app/<App-ID>/local-api/`. Der Ordner hat die Rechte 0700, der Socket 0600.
+  - Der MCP-Eintrag nennt zusätzlich `GIROCRAB_API_SOCKET`, weil `girocrab-mcp` nur unter macOS
+    einen Standardpfad kennt.
+  - `.deb` und Flatpak enthalten das Hilfsprogramm noch nicht. Die Seite meldet dann „Das
+    Hilfsprogramm ist in diesem Build nicht enthalten.“; gesucht wird neben `girocrab`. In
+    Entwickler-Builds dient `target/{release,debug}/girocrab-mcp` des Repositorys.
+  - Den Hinweis auf eine vorübergehende App-Kopie (App Translocation) gibt es nur unter macOS.
+
 ### Advanzia-Karten (#935)
 
 - **Bank hinzufügen › „Advanzia Bank (Zugang mein.advanzia.com)“:** Abruf im Browserfenster. Sie
