@@ -313,6 +313,11 @@ Funktionsumfang der Oberfläche.
   sind benannt; der blaue „neu“-Punkt am Händlersymbol wird mitgesprochen.
 - Im Privatmodus und beim Problem melden folgen auch die vorgelesenen Namen und Beträge der
   Schwärzung.
+- **Große Schrift ohne Abschneiden:** Gruppennamen in der Seitenleiste, „x % getilgt“ sowie Regel- und
+  Kategoriename in der Regelliste bekommen eine zweite Zeile statt „…“. Die Spalten des
+  Datenbank-Imports und die Eingabefelder in „Bewertungen/Anzahl bearbeiten“ wachsen mit der Schrift.
+  Titel und Betrag der Kennzahl-Kacheln werden wie am Mac etwas kleiner, bevor sie abgeschnitten
+  werden.
 
 ### Kleinere Punkte
 

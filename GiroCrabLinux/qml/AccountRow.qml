@@ -101,7 +101,7 @@ SidebarRow {
                 Text {
                     visible: row.repaid !== null
                     text: qsTr("%1 getilgt").arg(Fmt.percent(row.repaid || 0)); font.pixelSize: Theme.caption2; color: Theme.secondary
-                    elide: Text.ElideRight; Layout.fillWidth: true
+                    elide: Text.ElideRight; Layout.fillWidth: true; wrapMode: Text.Wrap; maximumLineCount: 2   // lineLimit(2) (#650)
                     Sensitive { amounts: true }
                 }
                 Text {
