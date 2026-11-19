@@ -78,6 +78,10 @@ Funktionsumfang der Oberfläche.
   anderen Zugangs wird beim Wechsel zurückgesetzt. Bei „Ohne Konto“ ist die Kontoauswahl gesperrt.
   „Belege anzeigen“ an einem Konto und das Verlassen der Ansicht setzen den Filter zurück. Ist der
   Platz zu knapp, stehen die Auswahlen untereinander.
+- **FFB-Postfach (#1105):** Bei FFB-Konten (FIL Fondsbank) zeigt „Dokumente / Kontoauszüge“
+  jetzt „Kontoauszüge abrufen“. Der Kern lädt Depot- und Kontoauszüge, Abrechnungen,
+  Steuerunterlagen und Mitteilungen aus dem Postfach, höchstens 200 PDFs pro Lauf, und erkennt
+  bereits geladene an ihrer ID.
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
