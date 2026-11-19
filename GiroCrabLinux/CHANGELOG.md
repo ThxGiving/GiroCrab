@@ -296,6 +296,15 @@ Funktionsumfang der Oberfläche.
 - Der Demo-Hinweis steht beim Hinzufügen einer Bank unter den Feldern statt darüber.
 - Startoptionen `--demo-sheet export` und `--demo-sheet transfer-girocode` für Screenshots.
 
+### Barrierefreiheit und Kontraste (#571, #648, #674, #827, #650)
+
+- **Geprüfte Theme-Farben statt Systemfarben:** Fehler- und Hinweistexte, das Sperrsymbol entzogener
+  Zugänge, die GuV der Depotpositionen, das Schild im Banking-Hinweis und der Hinweis bei „Andere
+  FinTS-Bank“ nutzen die Theme-Farben für negativ, Warnung und Eingang (WCAG AA) statt Rot, Orange
+  und Grün.
+- **IBAN-/BIC-Prüfung im Überweisungsdialog:** Das Prüfsymbol sagt Orca, ob die IBAN stimmt („Prüfsumme
+  korrekt“ / „IBAN ungültig (Prüfsumme/Länge)“) und ob die BIC gültig ist.
+
 ### Kleinere Punkte
 
 - **Kategoriesummen folgen den Filtern (#621):** Die Summen unter „Kategorien“ in der

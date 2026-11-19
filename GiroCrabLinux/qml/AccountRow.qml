@@ -77,7 +77,7 @@ SidebarRow {
                     ToolTip.text: AppModel.masking(row.account.owner || "")
                     Sensitive {}
                 }
-                SFIcon { visible: row.account.access_revoked; symbol: "lock.slash"; size: 10; color: "orange"
+                SFIcon { visible: row.account.access_revoked; symbol: "lock.slash"; size: 10; color: Theme.warning
                          Accessible.name: qsTr("Zugriff entzogen")
                          HoverHandler { id: revokedHover }
                          ToolTip.visible: revokedHover.hovered; ToolTip.delay: 600

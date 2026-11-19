@@ -1033,5 +1033,8 @@ Sheet {
         color: ok ? Theme.inflow : Theme.negative
         HoverHandler { id: hover }
         ToolTip.visible: hover.hovered && ToolTip.text !== ""
+        // TransferSheetView.swift › IBAN/BIC check (#827): `.accessibilityLabel` = the tooltip text.
+        Accessible.role: Accessible.Graphic
+        Accessible.name: ToolTip.text
     }
 }
