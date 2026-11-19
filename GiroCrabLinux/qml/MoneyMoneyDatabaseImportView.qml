@@ -490,7 +490,7 @@ ColumnLayout {
                                 Layout.preferredWidth: 22
                                 checked: rowItem.c.selected
                                 onToggled: v.setChoice(rowItem.modelData, { selected: checked })
-                                Accessible.name: qsTr("„%1“ importieren").arg(rowItem.modelData.name)
+                                Accessible.name: qsTr("„%1“ importieren").arg(AppModel.masking(rowItem.modelData.name))
                             }
                             ColumnLayout {
                                 spacing: 1; Layout.fillWidth: true
@@ -513,6 +513,7 @@ ColumnLayout {
                             }
                             AppComboBox {
                                 Layout.preferredWidth: 150
+                                Accessible.name: qsTr("Kontoart")   // Picker("Kontoart", …).labelsHidden() (ff91866)
                                 textRole: "text"
                                 model: v.kindChoices
                                 currentIndex: Math.max(0, v.kindChoices.findIndex(k => k.id === rowItem.c.kind))
@@ -522,6 +523,7 @@ ColumnLayout {
                                 id: targetBox
                                 visible: accountTable.showTarget
                                 Layout.preferredWidth: 170
+                                Accessible.name: qsTr("Ziel")
                                 textRole: "text"
                                 readonly property var a: rowItem.modelData
                                 model: {

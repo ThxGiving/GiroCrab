@@ -725,6 +725,12 @@ Rectangle {
             - (checkIcon.visible ? checkIcon.width + 8 : 0) - (pendingIcon.visible ? pendingIcon.width + 8 : 0)
             - amountColumn.implicitWidth - 8
         implicitHeight: Math.max((effectiveDensity === "compact" ? 28 : 44) * Theme.textScale, column.implicitHeight) + 2 * verticalPadding
+        // DayCard: .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton) (ff91866);
+        // name, amount and date follow the redaction like the planned rows.
+        Accessible.role: Accessible.Button
+        Accessible.name: booking ? AppModel.masking(booking.merchant.name || booking.booking_text) + ", "
+            + AppModel.masking(Fmt.money(booking.amount_cents), AppModel.redactAmounts) + ", " + Fmt.medium(booking.booking_date) : ""
+        Accessible.selected: booking !== null && AppModel.selectedBookingID === booking.id
 
         ColumnLayout {
             id: column
@@ -878,6 +884,10 @@ Rectangle {
                             HoverHandler { id: chevronHover }
                             ToolTip.visible: chevronHover.hovered; ToolTip.delay: 600
                             ToolTip.text: br.expanded ? qsTr("Artikel einklappen") : qsTr("Alle Artikel anzeigen")
+                            // BookingRow: .accessibilityLabel(amazonExpanded ? … : …) (#571)
+                            Accessible.role: Accessible.Button
+                            Accessible.name: ToolTip.text
+                            Accessible.onPressAction: stream.toggleAmazonExpanded(br.booking.id)
                         }
                         Item { Layout.fillWidth: true }
                     }
@@ -988,7 +998,7 @@ Rectangle {
             visible: parent.suggested !== null
             Layout.leftMargin: 4
             spacing: 3
-            Accessible.name: parent.suggested ? qsTr("Vorschlag: %1").arg(parent.suggested.name) : ""
+            Accessible.name: parent.suggested ? qsTr("Vorschlag: %1").arg(AppModel.masking(parent.suggested.name, AppModel.redactLabels)) : ""
             SFIcon { symbol: "clock.arrow.circlepath"; size: 11; color: Theme.secondary }
             Text { text: parent.parent.suggested ? parent.parent.suggested.name : ""; font.pixelSize: Theme.callout + 1; color: Theme.secondary; elide: Text.ElideRight
                    Sensitive { labels: true } }

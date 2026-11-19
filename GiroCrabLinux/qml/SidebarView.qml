@@ -280,7 +280,8 @@ Rectangle {
                         spacing: SidebarModel.gap
                         SidebarChevron { open: modelData.open
                                          onToggled: modelData.bank ? AppModel.toggleCollapsedBank(g.id) : AppModel.toggleCollapsedGroup(g.id)
-                                         accessibleName: open ? qsTr("„%1“ einklappen").arg(g.name) : qsTr("„%1“ ausklappen").arg(g.name) }
+                                         readonly property string spokenName: modelData.bank ? g.name : AppModel.masking(g.name, AppModel.redactLabels)
+                                         accessibleName: open ? qsTr("„%1“ einklappen").arg(spokenName) : qsTr("„%1“ ausklappen").arg(spokenName) }
                         SFIcon { symbol: g.sf_symbol; size: 15; Layout.preferredWidth: 20 }
                         Text { text: g.name; font.pixelSize: Theme.body; font.weight: Font.DemiBold; color: Theme.secondary; elide: Text.ElideRight; Layout.fillWidth: true
                                Sensitive { labels: true; when: !modelData.bank } }   // bank names stay visible
@@ -385,7 +386,7 @@ Rectangle {
                         anchors.fill: parent; anchors.leftMargin: SidebarModel.rowLeading + modelData.depth * SidebarModel.iconInset; anchors.rightMargin: SidebarModel.rowTrailing
                         spacing: SidebarModel.gap
                         SidebarChevron { visible: modelData.hasChildren; open: modelData.open; onToggled: AppModel.toggleExpandedCategory(c.id)
-                                         accessibleName: open ? qsTr("„%1“ einklappen").arg(c.name) : qsTr("„%1“ ausklappen").arg(c.name) }
+                                         accessibleName: open ? qsTr("„%1“ einklappen").arg(AppModel.masking(c.name, AppModel.redactLabels)) : qsTr("„%1“ ausklappen").arg(AppModel.masking(c.name, AppModel.redactLabels)) }
                         Item { visible: !modelData.hasChildren; implicitWidth: SidebarModel.slot }
                         // CategoryRow: HStack(spacing: 8)
                         RowLayout {

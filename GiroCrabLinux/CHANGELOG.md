@@ -304,6 +304,15 @@ Funktionsumfang der Oberfläche.
   und Grün.
 - **IBAN-/BIC-Prüfung im Überweisungsdialog:** Das Prüfsymbol sagt Orca, ob die IBAN stimmt („Prüfsumme
   korrekt“ / „IBAN ungültig (Prüfsumme/Länge)“) und ob die BIC gültig ist.
+- **Bildschirmleser (Orca):** Symbol-Buttons werden mit ihrem Tooltip-Text vorgelesen statt namenlos.
+  Diagramme haben Namen und eine Zusammenfassung wie in der Mac-App („Summen der Kategorie“ mit
+  „Summe je Monat“ / „Ausgaben je Quartal“ …, „Cashflow“, „Konsum vs. Investition“), Budgetbalken
+  sagen „85 % des Budgets verbraucht“ (über 100 % mit „überschritten“). Segment-Umschalter,
+  Symbolauswahl, Farbe zurücksetzen, Artikel aufklappen, Auswahlfelder ohne sichtbare Beschriftung
+  („Von Konto“, „Kategorie“, „Kontoart“, „Ziel“, Zugangsfelder) und Buchungszeilen (mit „ausgewählt“)
+  sind benannt; der blaue „neu“-Punkt am Händlersymbol wird mitgesprochen.
+- Im Privatmodus und beim Problem melden folgen auch die vorgelesenen Namen und Beträge der
+  Schwärzung.
 
 ### Kleinere Punkte
 

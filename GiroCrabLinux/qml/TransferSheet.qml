@@ -349,6 +349,7 @@ Sheet {
                             label: qsTr("Von")
                             AppComboBox {
                                 Layout.preferredWidth: 300
+                                Accessible.name: qsTr("Von Konto")   // Picker("Von Konto", …) (ff91866)
                                 model: AppModel.transferFormAccounts.map(a => a.name + " · " + Fmt.iban(a.iban))
                                 currentIndex: AppModel.transferFormAccounts.findIndex(a => a.id === sheet.draft.account_id)
                                 onActivated: i => AppModel.setDraft({ account_id: AppModel.transferFormAccounts[i].id })   // → onSenderIDChanged

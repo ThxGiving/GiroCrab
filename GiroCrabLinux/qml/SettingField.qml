@@ -13,12 +13,14 @@ ColumnLayout {
     TextArea {
         visible: f.key.indexOf("private_key") >= 0
         Layout.fillWidth: true; Layout.preferredHeight: 80
+        Accessible.name: f.entry ? f.entry.label : f.key   // SecureField(label, …).labelsHidden() (ff91866)
         font.family: "monospace"; font.pixelSize: Theme.caption
         onTextChanged: if (visible) f.edited(text)
     }
     TextField {
         visible: f.key.indexOf("private_key") < 0
         Layout.fillWidth: true
+        Accessible.name: f.entry ? f.entry.label : f.key
         echoMode: (f.entry ? f.entry.is_secret : f.key.indexOf("secret") >= 0) ? TextInput.Password : TextInput.Normal
         placeholderText: f.entry && f.entry.value && !f.entry.is_secret ? f.entry.value : qsTr("Erforderlich")
         onTextChanged: if (visible) f.edited(text)
