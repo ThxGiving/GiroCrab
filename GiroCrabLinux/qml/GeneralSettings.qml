@@ -113,7 +113,7 @@ ScrollView {
                 }
             }
             Text { Layout.fillWidth: true; wrapMode: Text.WordWrap; font.pixelSize: Theme.caption; color: Theme.secondary
-                   text: qsTr("Blendet Beträge aus, wenn du die App jemandem zeigst. Auf Wunsch auch Namen, Kontonummern und Verwendungszwecke.") }
+                   text: qsTr("Blendet Beträge, Namen, Kontonummern und Verwendungszwecke aus, wenn du die App jemandem zeigst. Auf Wunsch nur die Beträge.") }
             CheckBox {
                 text: qsTr("Auswertungen in der Übersicht anzeigen")
                 checked: AppModel.showStatistics
@@ -171,7 +171,9 @@ ScrollView {
                 }
             }
             Text { Layout.fillWidth: true; wrapMode: Text.WordWrap; font.pixelSize: Theme.caption; color: Theme.secondary
-                   text: qsTr("Eine ausgewählte Buchung gilt nach dieser Zeit als geprüft – wie eine gelesene E-Mail. Bei Mehrfachauswahl nie.") }
+                   text: AppModel.autoReviewDelay === "account"
+                         ? qsTr("Angeklickte Umsätze werden sofort als gelesen markiert. Beim Wechsel auf ein anderes Konto werden alle übrigen ungelesenen Umsätze des vorherigen Kontos als gelesen markiert, unabhängig von Zeitraum und Filtern.")
+                         : qsTr("Eine ausgewählte Buchung gilt nach dieser Zeit als geprüft – wie eine gelesene E-Mail. Bei Mehrfachauswahl nie.") }
         }
         // SettingsView.swift › TransferSettingsSection: opt-in clipboard check (#663), per device
         SettingsFormSection {

@@ -14,7 +14,7 @@ QtObject {
         category: "privacy"
         property bool enabled: false
         /// PrivacyMode.Scope: "amounts" | "personal"
-        property string scope: "amounts"
+        property string scope: ""
     }
 
     readonly property bool enabled: store.enabled
@@ -25,8 +25,8 @@ QtObject {
     readonly property var scopes: [
         { id: "amounts", title: qsTr("Beträge") },
         { id: "personal", title: qsTr("Beträge und persönliche Angaben") }]
-    /// The stored choice; unknown or missing values fall back to "amounts".
-    readonly property string scope: store.scope === "personal" ? "personal" : "amounts"
+    /// The stored choice; until one is picked: names, IBANs and purposes too (PrivacyMode.defaultScope, #1007).
+    readonly property string scope: store.scope === "amounts" ? "amounts" : "personal"
     function setScope(id) { store.scope = id }
 
     /// `Scope.redaction` as AppModel bits (redactPersonal 1, redactAmounts 4): `.amounts`, or

@@ -69,7 +69,7 @@ use base64::Engine;
 use serde::{Deserialize, Serialize};
 
 use self::accounts::{account_label, kind_from_code};
-use self::dialog::{approval_pending, has_so_prefix};
+use self::dialog::{approval_pending, has_so_prefix, is_comdirect};
 use self::syntax::{Segment, SegmentBuilder};
 use super::{
     BankConnector, BatchTransferJob, Challenge, ChallengeResponse, ConnectContext, DebitJob,
@@ -78,6 +78,7 @@ use super::{
 use crate::error::{CoreError, CoreResult};
 use crate::i18n::{tr, trf};
 use crate::models::AccountKind;
+use crate::secret::SecretJson;
 
 const COUNTRY: &str = "280";
 
@@ -136,6 +137,11 @@ struct FinTsState {
     /// the dialog is opened with the one-step function 999 and without HKTAN.
     #[serde(default)]
     single_step: bool,
+    /// comdirect: the bank code this login is known under when it differs from
+    /// the connector's (taken from an IBAN). Found by [`FinTsConnector::login`]
+    /// after a 9210 "Bankleitzahl passt nicht zum Benutzer"; "" = the connector's.
+    #[serde(default)]
+    login_blz: String,
 }
 
 /// Account from the user parameter data (HIUPD).
@@ -153,16 +159,21 @@ struct UpdAccount {
     allowed: HashSet<String>,
 }
 
+impl UpdAccount {
+    fn allows(&self, tx: &str) -> bool {
+        self.allowed.is_empty() || self.allowed.contains(tx)
+    }
+}
+
 /// Consorsbank (BNP Paribas): see `docs/consorsbank-connector.md`.
 const CONSORSBANK_BLZ: &str = "76030080";
 
-/// FinTS date `YYYYMMDD` → `YYYY-MM-DD`; `None` unless exactly 8 ASCII digits
-/// (no byte slicing into a multi-byte character).
+/// FinTS date `YYYYMMDD` → `YYYY-MM-DD`; `None` unless exactly 8 digits naming a real day.
 fn fints_date(d: &str) -> Option<String> {
-    if d.len() != 8 || !d.bytes().all(|b| b.is_ascii_digit()) {
+    if d.len() != 8 {
         return None;
     }
-    Some(format!("{}-{}-{}", &d[..4], &d[4..6], &d[6..]))
+    crate::dates::parse_yyyymmdd(d).map(crate::dates::iso)
 }
 
 #[derive(Debug, Clone)]
@@ -275,6 +286,9 @@ pub struct FinTsConnector {
     vop_with_tan: bool,
     /// Name-check result shown to the user, awaiting confirmation.
     vop_pending: Option<PayeeMatch>,
+    /// The last dialog init was rejected because the bank code does not
+    /// belong to this login (9210, see [`blz_mismatch`]).
+    blz_rejected: bool,
 }
 
 /// A transfer order ready to send (segment number set at send time).
@@ -340,6 +354,7 @@ impl FinTsConnector {
             vop_id: None,
             vop_with_tan: false,
             vop_pending: None,
+            blz_rejected: false,
         }
     }
 
@@ -365,8 +380,8 @@ impl BankConnector for FinTsConnector {
             let bytes = zeroize::Zeroizing::new(
                 base64::engine::general_purpose::STANDARD
                     .decode(keyfile)
-                    .map_err(|_| CoreError::InvalidInput {
-                        message: "Ungültige gespeicherte Schlüsseldatei.".into(),
+                    .map_err(|_| {
+                        CoreError::invalid(tr("Ungültige gespeicherte Schlüsseldatei."))
                     })?,
             );
             let mut file = keyfile::KeyFile::open(&bytes, ctx.secret.expose().as_bytes())?;
@@ -401,8 +416,13 @@ impl BankConnector for FinTsConnector {
                 message: tr("PIN ist leer").into(),
             });
         }
-        if let Ok(st) = serde_json::from_value::<FinTsState>(ctx.state.clone()) {
+        if let Ok(st) = ctx.state.decode::<FinTsState>() {
             self.st = st;
+        }
+        // comdirect: log in under the bank code found last time (the address
+        // above is the same for all of comdirect's codes)
+        if self.rah.is_none() && is_comdirect(&self.blz) && is_comdirect(&self.st.login_blz) {
+            self.blz = self.st.login_blz.clone();
         }
         if let Some(rah) = &self.rah {
             if self.st.system_id.is_empty() {
@@ -422,10 +442,7 @@ impl BankConnector for FinTsConnector {
                     self.tan_medium_override.clone()
                 };
         }
-        if self.st.system_id.is_empty() || self.st.sec_func.is_empty() {
-            self.sync_dialog(ctx).await?;
-        }
-        self.open_dialog(ctx).await
+        self.login(ctx).await
     }
 
     async fn respond(
@@ -439,9 +456,7 @@ impl BankConnector for FinTsConnector {
         let task = self
             .task_reference
             .clone()
-            .ok_or_else(|| CoreError::Protocol {
-                message: "no pending TAN task".into(),
-            })?;
+            .ok_or_else(|| CoreError::protocol("no pending TAN task"))?;
         let sec = self.sec();
         // Name matched: HKVPA (VOP-ID) goes along with the approval.
         let mut payload = Vec::new();
@@ -495,30 +510,24 @@ impl BankConnector for FinTsConnector {
         // not yet booked entries ("vorgemerkt"), see `camt::HOLD_PREFIX`
         let (mut holds_listed, mut holds_complete) = (false, true);
         // Explicit statements fetch (Vault::fetch_account_statements): HKEKA of one account only.
-        let auto_statements: Vec<String> = ctx
-            .settings
-            .get(super::STATEMENTS_AUTO)
-            .map(|v| v.expose().split(',').map(str::to_string).collect())
-            .unwrap_or_default();
-        if let Some(wanted) = ctx.settings.get(super::STATEMENTS_ONLY) {
-            let wanted = wanted.expose().to_string();
-            let Some((acc, upd)) = accounts.iter().find(|(a, _)| account_label(a) == wanted) else {
+        let auto_statements = ctx.documents.due_statements();
+        if let super::Documents::StatementsOnly(wanted) = &ctx.documents {
+            let Some((acc, upd)) = accounts.iter().find(|(a, _)| account_label(a) == *wanted)
+            else {
                 return Err(CoreError::NotFound {
-                    what: trf("Konto {0}", &[&wanted]),
+                    what: trf("Konto {0}", &[wanted]),
                 });
             };
             // HKEKA, or HKEKP when the bank offers only that (DKB, #449)
             let tx = self.statement_tx();
-            let upd_allows = upd
-                .as_ref()
-                .map(|u| u.allowed.is_empty() || u.allowed.contains(tx.unwrap_or("HKEKA")));
+            let upd_allows = upd.as_ref().map(|u| u.allows(tx.unwrap_or("HKEKA")));
             self.log_statement_support(upd_allows);
             // Not an error (#449): the app reports "no new statements" with a hint.
             let Some(tx) = tx.filter(|_| upd_allows.unwrap_or(true)) else {
                 crate::depot_debug::log("statements: no PDF statements offered for this account");
                 return Ok(result);
             };
-            result.documents = match self.statements_pdf(ctx, acc, &wanted).await {
+            result.documents = match self.statements_pdf(ctx, acc, wanted).await {
                 Ok(d) => d,
                 Err(CoreError::Bank { code, .. }) if matches!(code.as_str(), "9130" | "9140") => {
                     crate::depot_debug::log(&format!("statements: {tx} unsupported ({code})"));
@@ -526,15 +535,11 @@ impl BankConnector for FinTsConnector {
                 }
                 Err(e) => return Err(e),
             };
-            result.state = Some(serde_json::to_value(&self.st)?);
+            result.state = Some(SecretJson::encode(&self.st)?);
             return Ok(result);
         }
         for (acc, upd) in &accounts {
-            let allowed = |tx: &str| {
-                upd.as_ref()
-                    .map(|u| u.allowed.is_empty() || u.allowed.contains(tx))
-                    .unwrap_or(true)
-            };
+            let allowed = |tx: &str| upd.as_ref().is_none_or(|u| u.allows(tx));
             let mut kind = upd
                 .as_ref()
                 .map(|u| kind_from_code(u.kind_code))
@@ -791,7 +796,7 @@ impl BankConnector for FinTsConnector {
         if holds_listed && holds_complete {
             result.hold_prefix = Some(camt::HOLD_PREFIX.into());
         }
-        result.state = Some(serde_json::to_value(&self.st)?);
+        result.state = Some(SecretJson::encode(&self.st)?);
         Ok(result)
     }
 
@@ -806,14 +811,11 @@ impl BankConnector for FinTsConnector {
         job: &TransferJob,
     ) -> CoreResult<Phase> {
         if self.rah.is_some() {
-            return Err(CoreError::InvalidInput {
-                message: "RAH-10 unterstützt zunächst nur Kontoabrufe.".into(),
-            });
+            return Err(CoreError::invalid(tr(
+                "RAH-10 unterstützt zunächst nur Kontoabrufe.",
+            )));
         }
-        self.transferring = true;
-        self.result = TransferResult::default();
-        self.order_submitted = false;
-        self.order = None;
+        self.begin_order();
         let r = self.start_transfer(ctx, job).await;
         if r.is_err() {
             self.transferring = false;
@@ -826,10 +828,7 @@ impl BankConnector for FinTsConnector {
         ctx: &ConnectContext,
         job: &BatchTransferJob,
     ) -> CoreResult<Phase> {
-        self.transferring = true;
-        self.result = TransferResult::default();
-        self.order_submitted = false;
-        self.order = None;
+        self.begin_order();
         let r = self.start_batch(ctx, job).await;
         if r.is_err() {
             self.transferring = false;
@@ -842,10 +841,7 @@ impl BankConnector for FinTsConnector {
         ctx: &ConnectContext,
         job: &StandingOrderJob,
     ) -> CoreResult<Phase> {
-        self.transferring = true;
-        self.result = TransferResult::default();
-        self.order_submitted = false;
-        self.order = None;
+        self.begin_order();
         let r = self.start_standing_order(ctx, job).await;
         if r.is_err() {
             self.transferring = false;
@@ -858,10 +854,7 @@ impl BankConnector for FinTsConnector {
         ctx: &ConnectContext,
         job: &DebitJob,
     ) -> CoreResult<Phase> {
-        self.transferring = true;
-        self.result = TransferResult::default();
-        self.order_submitted = false;
-        self.order = None;
+        self.begin_order();
         let r = self.start_direct_debit(ctx, job).await;
         if r.is_err() {
             self.transferring = false;

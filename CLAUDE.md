@@ -9,9 +9,10 @@ Rust core (`girocrab-core`, UniFFI) + SwiftUI app (`GiroCrabApp`). Root = this d
 - `girocrab-core/src/vault/` – `impl Vault` per feature: `accounts.rs`, `bookings.rs` (list_transactions/paging), `categories.rs`, `connections.rs` (bank logins, stored PIN), `rules.rs`, `settings.rs`, `merge.rs`
 - `girocrab-core/src/schema.rs` – versioned schema migrations (see `docs/ARCHITECTURE.md`)
 - `girocrab-core/src/connectors/` – `mod.rs` (submodule decls + shared HTTP helpers), `types.rs` (`BankConnector`
-  trait + DTOs), `catalog.rs` (`descriptor`, `make_connector*`), `sync_session.rs` / `transfer_session.rs` (FFI state
-  machines), `persist.rs` (`impl Vault`: `store_fetch`, `begin_sync`/`begin_transfer`), tests in `connectors/tests/`;
-  connector impls alongside: `fints/`, `comdirect.rs`, `trade_republic.rs`, `enable_banking.rs`, `paypal.rs`
+  trait + DTOs), `catalog.rs` (`descriptor`, `make_connector*`), `bank_directory.rs` (search routing + curated PSD2 catalog),
+  `sync_session.rs` / `transfer_session.rs` (FFI state machines), `persist.rs` (`impl Vault`: `store_fetch`,
+  `begin_sync`/`begin_transfer`), tests in `connectors/tests/`; connector impls alongside: `fints/`, `comdirect.rs`,
+  `trade_republic.rs`, `enable_banking.rs` (`needs_lean_request` 90d cap for Revolut/Spuerkeess/N26), `paypal.rs`
 - `girocrab-core/src/importers/` – one-off file/web-capture importers: `moneymoney_db.rs` (encrypted SQLCipher database import),
   `moneymoney_import.rs` (CSV/XML/CAMT/MT940 exports), `portal_import.rs` (Amex/Amazon Visa web + CSV/PDF import),
   `amazon_orders.rs`
@@ -39,7 +40,8 @@ Other UI files live in the same `GiroCrabUI/` dir. A view with its own design pa
 ## Builds
 - **Swift-only change** (only `GiroCrabApp/**/*.swift`): NEVER rebuild `girocrab-core` or run `./build-xcframework.sh`. Run only `swift build -q` (in `GiroCrabApp/`) or `xcodebuild -quiet`.
 - Rust change: `cargo check -q -p girocrab-core`; rebuild the xcframework only if the UniFFI API changed.
-- Before every push run `cargo fmt --all`: CI fails on `cargo fmt --check` and then skips the Swift job. Enable the hook once: `git config core.hooksPath .githooks`.
+- Before every push run `cargo fmt --all`: CI fails on `cargo fmt --check` and then skips the Swift job. Enable the hook once: `git config core.hooksPath .githooks`
+  (pre-push runs every cheap CI lint via `scripts/verify-fast.sh --lint-only`, ~10 s; without the flag it adds clippy and the serde check for the changed files, `--tests` the unit tests).
 - Always pass `-q`/`--quiet` to `cargo check`, `cargo test`, `xcodebuild`. If output is still long, pipe through `tail -n 40`.
 - Before pushing a PR (also Swift-only ones; CI runs these on every PR): `cargo fmt --all -- --check` and `cargo clippy -q --workspace --all-targets -- -D warnings`. After pushing, check `gh pr checks`.
   Under clippy the root `build.rs` skips the xcframework + Swift app build (~8 s instead of ~90 s after a core
@@ -89,6 +91,11 @@ Internal code identifiers (module, function, test and file names) are exempt; `s
   `scripts/lint-vault-access.sh` enforces this in CI.
 - `vault.list_transactions` enriches every row in the filter (merchant, flow, sums); `limit`/`offset`
   only trim the result. Never call it for a count or a sum – add a SQL aggregate.
+- **Multi-currency invariant (#569):** Never sum amounts across different currencies into one total. `EUR` is the primary
+  aggregate currency; non-EUR currencies are grouped and displayed separately per currency (*„Zusätzlich: …“*).
+- **PR size & schema splitting:** Keep each PR to one focused concern (~15–20 files max). Oversized multi-feature PRs are
+  automatically put on `hold` by the review gate. If a feature needs a schema migration, land the schema step + core model
+  in a small standalone PR first so parallel PRs do not collide on `STEPS` numbers.
 - An edit must either reload synchronously or declare what it invalidates (`rulesStale`,
   `dashboardStale`, `categoryRefreshTask`). A cancelled background load must never be the only
   thing that would have refreshed a view.
@@ -238,3 +245,12 @@ whenever `README.md`, `docs/screenshots/**`, `docs/assets/**` or a release chang
 ## Data tables
 `girocrab-core/data/*.tsv` are embedded at compile time and parsed by `src/data_tables.rs`: `bic_directory.tsv` (BIC),
 `fints_directory.tsv` (FinTS endpoints), `merchants.tsv` (merchant dictionary). Never read them whole; `grep -n` a key instead.
+
+## Bank-Konnektoren: End-to-End-Pflicht (kein reiner Core-Merge)
+- Ein neuer Bank- oder Depot-Konnektor gilt **nicht** als fertig und darf sein Feature-Issue nicht schließen, solange er nur als Parser in `girocrab-core/src/connectors/` existiert.
+- Jeder Konnektor-PR muss zwingend alle vier Ebenen verdrahten:
+  1. Core-Konnektor (`girocrab-core/src/connectors/`)
+  2. Bankenkatalog / Preset-Registrierung
+  3. FFI-Anbindung (`girocrab-core` / UniFFI)
+  4. UI-Einrichtung & Tests in `GiroCrabApp`
+- Vor jedem PR `bash scripts/lint-connectors.sh` ausführen (und bei Nacharbeit an `finpension` / `paypal_nvp` deren Eintrag aus der Allowlist entfernen).

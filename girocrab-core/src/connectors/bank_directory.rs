@@ -116,6 +116,8 @@ pub fn psd2_catalog() -> Vec<Psd2Bank> {
         psd2("Hanseatic Bank", "DE", "Hanseatic Bank", None),
         psd2("Santander", "DE", "Santander", None),
         psd2("Commerzbank", "DE", "Commerzbank", None),
+        psd2("ING Business", "DE", "ING Business", None),
+        psd2("Trade Republic", "DE", "Trade Republic", None),
         psd2("Raiffeisen Bank (Österreich)", "AT", "Raiffeisen", None),
         psd2("Erste Bank (Österreich)", "AT", "Erste Bank", None),
         psd2("Bank Austria", "AT", "Bank Austria", None),
@@ -166,6 +168,11 @@ fn own_api() -> Vec<(ConnectorKind, &'static str, &'static str)> {
             ConnectorKind::OpelDirektbank,
             "Opel Direktbank",
             "opel direktbank opelbank opel-direktbank stellantis tagesgeld festgeld",
+        ),
+        (
+            ConnectorKind::Finpension,
+            "Finpension",
+            "finpension saeule 3a säule 3a freizuegigkeit freizügigkeit 1e schweiz vorsorge",
         ),
         (
             ConnectorKind::Ffb,
@@ -455,9 +462,7 @@ impl Vault {
         if !country.is_empty()
             && !(country.len() == 2 && country.bytes().all(|b| b.is_ascii_uppercase()))
         {
-            return Err(CoreError::InvalidInput {
-                message: "country must be a two-letter code".into(),
-            });
+            return Err(CoreError::invalid("country must be a two-letter code"));
         }
         let mut req = super::http_client()?
             .get("https://api.enablebanking.com/aspsps")
@@ -634,6 +639,8 @@ mod tests {
         let r = search("n26", vec![], 10);
         assert!(r.iter().all(|b| b.mode == BankAccessMode::Psd2));
         assert!(ids(&r).contains(&"psd2:DE:N26".to_string()));
+        let tr_res = search("trade republic", vec![], 10);
+        assert!(ids(&tr_res).contains(&"psd2:DE:Trade Republic".to_string()));
 
         let r = search("bunq", vec![], 10);
         assert_eq!(ids(&r), vec!["api:bunq"]);
@@ -667,6 +674,9 @@ mod tests {
         assert!(r
             .iter()
             .any(|b| b.mode == BankAccessMode::FinTs && b.blz == "50010517"));
+        assert!(r
+            .iter()
+            .any(|b| b.mode == BankAccessMode::Psd2 && b.name == "ING Business"));
         assert!(search("DKB", vec![], 5).iter().any(|b| b.blz == "12030000"));
         assert!(search("volksbank", vec![], 5)
             .iter()
