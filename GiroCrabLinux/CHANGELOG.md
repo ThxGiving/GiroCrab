@@ -17,6 +17,10 @@ Funktionsumfang der Oberfläche.
   gesperrt. Wird die Runde nach 90 Sekunden nicht fertig, gibt sie auf („Nicht alle Karten ließen
   sich öffnen – übernommen werden die bisher geladenen Karten.“), und die bisher geladenen Karten
   lassen sich übernehmen.
+- **FinTS-Registrierung (#1092):** Wie in der Mac-App 0.8.6 gibt es keine Auswahl mehr. Wenn die
+  Version eine FinTS-Registrierung von GiroCrab enthält, wird sie immer verwendet; das gilt auch für
+  Tresore, die bisher auf „Eigene Registrierung“ standen. Eine eigene Registrierung bleibt
+  gespeichert.
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
