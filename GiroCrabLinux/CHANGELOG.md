@@ -72,6 +72,12 @@ Funktionsumfang der Oberfläche.
   Dokumente, die Seitenleiste (Untertitel zwischen Bank und Notiz) und „Konto hinzufügen“ bei den
   Regeln den Inhaber dazu. Fehlt er oder haben beide denselben, steht dort das Ende der IBAN bzw.
   Kontonummer („…1234“).
+- **„Belege & PostBox“ nach Bankzugang filtern (#1042):** Vor der Kontoauswahl steht die Auswahl
+  „Bankzugang“ mit „Alle Bankzugänge“, „Ohne Konto“ und den Zugängen, die Konten haben. Sie erscheint
+  erst ab zwei Zugängen. Die Kontoauswahl zeigt dann nur die Konten dieses Zugangs; ein Konto eines
+  anderen Zugangs wird beim Wechsel zurückgesetzt. Bei „Ohne Konto“ ist die Kontoauswahl gesperrt.
+  „Belege anzeigen“ an einem Konto und das Verlassen der Ansicht setzen den Filter zurück. Ist der
+  Platz zu knapp, stehen die Auswahlen untereinander.
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
