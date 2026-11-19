@@ -28,6 +28,10 @@ Funktionsumfang der Oberfläche.
   versuchen“. Browser-Login, Einrichtungsformular und der Wechsel auf GiroCrabs Registrierung behalten
   den Durchlauf; „Eigene Registrierung eintragen …“ beendet ihn. Der automatische Abruf wartet, solange
   der Durchlauf nicht fertig ist. Startoption `--demo-sheet error-batch`.
+- **Amazon-Bestellungen (#1008):** Während des Abrufs liegt eine Fläche über der Seite. Sie zeigt das
+  Jahr bzw. die Bestellung groß, einen Fortschrittsbalken für beide Phasen (Bestelllisten je Jahr,
+  Bestelldetails), „1 Bestellung gefunden“ / „%1 Bestellungen gefunden“ bzw. „Bestelldetails aus …“
+  und „Abrufen stoppen“. Bisher zeigte nur eine kleine Zeile im Kopf den Fortschritt.
 
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
