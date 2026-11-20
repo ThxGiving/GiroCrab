@@ -259,6 +259,14 @@ Sheet {
         currentFolder: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
         onAccepted: { const file = selectedFile; sheet.saveThen(c => AppModel.importStatement(c, file)) }
     }
+    // Finpension export (#975): CSV, JSON or plain text, like the Mac's file importer
+    FileDialog {
+        id: finpensionDialog
+        title: qsTr("Finpension-Export importieren …")
+        nameFilters: [qsTr("Finpension-Export (*.csv *.json *.txt)"), qsTr("Alle Dateien (*)")]
+        currentFolder: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
+        onAccepted: { sheet.save(); const c = sheet.current(); sheet.close(); AppModel.importFinpension(c, selectedFile) }
+    }
 
     ColumnLayout {
         width: sheet.availableWidth
@@ -334,6 +342,14 @@ Sheet {
                     Text { visible: sheet.showAdvanced; Layout.fillWidth: true; wrapMode: Text.WordWrap; font.pixelSize: Theme.caption; color: Theme.secondary
                            text: qsTr("Ist die API-Signatur gesetzt, ruft GiroCrab per API-Benutzername, API-Passwort und Signatur ab; Client-ID und Secret werden dann nicht gebraucht.") }
                     Repeater { model: sheet.showAdvanced ? sheet.advancedKeys : []; KeyField { required property string modelData; key: modelData } }
+                }
+                // Finpension (#975): no interface, the export file is imported here
+                SettingsFormSection {
+                    visible: sheet.kind === "Finpension"
+                    Text { Layout.fillWidth: true; wrapMode: Text.WordWrap; font.pixelSize: Theme.caption; color: Theme.secondary
+                           text: qsTr("Finpension hat keine Schnittstelle: Laden Sie in Ihrem Finpension-Konto den Export (CSV oder JSON) mit Positionen und Cash-Buchungen herunter und lesen Sie ihn hier ein. Säule 3a, Freizügigkeit und 1e werden gleich behandelt. Es gibt keine Anmeldung und keinen Netzwerkzugriff.") }
+                    Button { text: qsTr("Finpension-Export importieren …"); icon.name: SF.icon("doc.badge.plus"); highlighted: true
+                             onClicked: finpensionDialog.open() }
                 }
                 SettingsFormSection {
                     visible: sheet.isPortal
@@ -420,11 +436,6 @@ Sheet {
                         onClicked: sheet.saveThen(c => AppModel.fetchComdirectPostbox(c))
                     }
                 }
-                SettingsFormSection {
-                    title: qsTr("Kontenauswahl")
-                    // saved by the sheet's own Speichern, so there is a single place to confirm (#720)
-                    AccountSelectionList { id: selection; connection: sheet.visible ? sheet.connection : null; showsSaveButton: false }
-                }
                 // Consorsbank via FinTS: documents from the Online-Archiv as well (#1024)
                 SettingsFormSection {
                     visible: sheet.isConsorsbankFinTS
@@ -455,6 +466,11 @@ Sheet {
                         enabled: AppModel.syncingConnectionID === null && !sheet.documentsBlocked
                         onClicked: { sheet.save(); const c = sheet.current(); sheet.close(); AppModel.fetchComdirectPostbox(c) }
                     }
+                }
+                SettingsFormSection {
+                    title: qsTr("Kontenauswahl")
+                    // saved by the sheet's own Speichern, so there is a single place to confirm (#720)
+                    AccountSelectionList { id: selection; connection: sheet.visible ? sheet.connection : null; showsSaveButton: false }
                 }
                 SettingsFormSection {
                     title: qsTr("Status")
