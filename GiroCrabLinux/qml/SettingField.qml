@@ -21,7 +21,7 @@ ColumnLayout {
         visible: f.key.indexOf("private_key") < 0
         Layout.fillWidth: true
         Accessible.name: f.entry ? f.entry.label : f.key
-        echoMode: (f.entry ? f.entry.is_secret : f.key.indexOf("secret") >= 0) ? TextInput.Password : TextInput.Normal
+        echoMode: AppModel.isSecretSetting(f.key, f.entry) ? TextInput.Password : TextInput.Normal
         placeholderText: f.entry && f.entry.value && !f.entry.is_secret ? f.entry.value : qsTr("Erforderlich")
         onTextChanged: if (visible) f.edited(text)
     }
