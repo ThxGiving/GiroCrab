@@ -719,6 +719,10 @@ fn call(method: &str, a: &Value) -> R {
         "set_connection_account_choices" => set_connection_account_choices(&vault()?, a),
         // Finpension export (#975), a local file: no login, no network
         "import_finpension_file" => import_finpension_file(&vault()?, a),
+        // the search field's text as the core searches it (plural stems, #54f83952)
+        "literal_search_term" => ok(crate::search_terms::literal_search_term(&arg::<String>(
+            a, "text",
+        )?)),
         // catalog / directory (free functions of the core)
         "bank_catalog" => ok(girocrab_core::bank_catalog()),
         "fints_presets" => ok(girocrab_core::connectors::fints_presets::fints_presets()),
