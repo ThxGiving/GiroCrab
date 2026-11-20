@@ -2006,6 +2006,15 @@ QtObject {
     }
     function startSync(connection, secret) {
         if (usesPortal(connection)) { webLoginConnection = connection; return }
+        // a manual sync never overwrites the running automatic session of another login
+        if (quietSyncConnectionID !== null && quietSyncConnectionID !== connection.id) return
+        // a manual sync of the same login while its automatic one runs: cancel that one, this one is not quiet
+        if (quietSyncConnectionID === connection.id && syncingConnectionID === connection.id) {
+            quietSyncConnectionID = null
+            const oldSession = activeSession
+            activeSession = null
+            if (oldSession !== null) coreAsync("session_cancel", { session: oldSession }, null, () => {})
+        }
         pendingLogin = null
         syncingConnectionID = connection.id
         const gen = ++syncGeneration
@@ -2237,13 +2246,12 @@ QtObject {
         logSync(connection.id, "Error", e.message, 0, syncLogSource(connection.id))   // source before statementsAccountID is cleared
         const retrySecret = failedSyncSecret
         failedSyncSecret = ""
-        if (quietSyncConnectionID !== null) {
+        if (quietSyncConnectionID === connection.id) {
             // scheduled sync: a notice instead of dialogs / login prompts
-            const quietID = quietSyncConnectionID
             quietSyncConnectionID = null
             pollTimer.stop()
             activeSession = null; activeChallenge = null; syncingConnectionID = null
-            const name = (connections.find(c => c.id === quietID) || {}).display_name || ""
+            const name = connection.display_name || ""
             toast = qsTr("%1: automatischer Abruf fehlgeschlagen – %2").arg(name).arg(e.message)
             statementsAccountID = null
             postboxConnectionID = null
@@ -2254,6 +2262,14 @@ QtObject {
         postboxConnectionID = null
         pollTimer.stop()
         activeSession = null; activeChallenge = null; syncingConnectionID = null
+        const missingID = isMissingProductID(e)
+        // Fall back to GiroCrab's registration (once) and retry with the same login; the batch stays
+        if (missingID && recoverFromMissingProductID()) {
+            const c = connections.find(x => x.id === connection.id)
+            if (c) startSync(c, retrySecret)
+            else syncNextInQueue()
+            return
+        }
         // AppModel+Sync.swift › finishSync: in "Alle abrufen" (#1041) an error ends only this
         // login. Its alert shows right away; the batch goes on once it is closed
         // ("Überspringen"), retries this login, or ends.
@@ -2279,14 +2295,9 @@ QtObject {
         // A prompt (browser login, setup form, retry with GiroCrab's registration) keeps the
         // batch: done, it syncs this login and goes on; cancelled, it skips it.
         if (e.kind === "BrowserLoginRequired") { toast = e.message; webLoginConnection = connection; return }
-        if (isMissingProductID(e)) {
+        if (missingID) {
             // Never a setup form for the optional FinTS registration: it would be an empty,
-            // seemingly mandatory field. Fall back to GiroCrab's registration (once), else offer the own ID.
-            if (recoverFromMissingProductID()) {
-                const c = connections.find(x => x.id === connection.id)
-                if (c) requestSync(c)
-                return
-            }
+            // seemingly mandatory field. Offer the own ID instead.
             resetSyncBatch()
             errorTitle = qsTr("Abruf von „%1“ fehlgeschlagen").arg(connection.display_name)
             errorRetry = null
