@@ -26,6 +26,9 @@ Funktionsumfang der Oberfläche.
   Hauptkategorie oder einer Zeile mit Unterkategorien darin (als letzte Unterkategorie). Eine Kategorie
   lässt sich nicht unter sich selbst oder ihre eigenen Unterkategorien ziehen. Ohne Maus geht es über
   „Nach oben“ / „Nach unten“ im Kontextmenü.
+- **Zähler der neuen Buchungen (Abweichung von der Mac-App):** Die Zahl steht als größerer Zähler am
+  Ende der Namenszeile statt klein an der Ecke des Kontosymbols, in kräftigem Blau auch im dunklen
+  Modus. Sie ist so besser lesbar und deckt auch dreistellig („100“, „999+“) nichts zu.
 
 ### Abruf und Portale wie in der Mac-App 0.8.6
 
