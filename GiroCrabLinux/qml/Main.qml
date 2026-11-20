@@ -356,6 +356,7 @@ ApplicationWindow {
                 options: AppModel.wealthScopes
                 current: AppModel.wealthScope
                 onActivated: id => AppModel.wealthScope = id
+                Accessible.name: qsTr("Ansicht")
             }
             // DocumentsScopePicker (DocumentsUI.swift, #526) in „Belege & PostBox“
             Segmented {
@@ -363,6 +364,7 @@ ApplicationWindow {
                 options: DocumentsScope.options
                 current: DocumentsScope.current
                 onActivated: id => DocumentsScope.current = id
+                Accessible.name: qsTr("Dokumente")
                 HoverHandler { id: docScopeHover }
                 ToolTip.text: qsTr("Alle Dokumente, eigene Belege oder Bankdokumente anzeigen"); ToolTip.visible: docScopeHover.hovered; ToolTip.delay: 600
             }
@@ -381,6 +383,7 @@ ApplicationWindow {
                 current: AppModel.scope
                 enabled: AppModel.sidebarSelection !== "newBookings"
                 onActivated: id => AppModel.scope = id
+                Accessible.name: qsTr("Ansicht")
                 ToolTip.text: qsTr("Ansicht wählen (Strg+1, Strg+2, Strg+3)")
             }
             IconButton { symbol: "paperplane"; enabled: AppModel.canTransfer; onClicked: AppModel.openTransfer(); ToolTip.text: qsTr("Neue Überweisung (Strg+N)"); ToolTip.visible: hovered }
