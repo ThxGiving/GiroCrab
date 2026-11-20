@@ -158,7 +158,7 @@ QtObject {
         if (used.length === 1) {
             out.title = used[0].name
             // the tag note stays even when the account name is part of it („Auto“ in „Tags: Auto-Kosten“)
-            const tagNote = TagFilter.note()
+            const tagNote = report.tag_note || ""
             out.filter_notes = (out.filter_notes || []).filter(n => n === tagNote || n.indexOf(used[0].name) < 0)
         } else {
             out.title = qsTr("Umsätze")
@@ -245,16 +245,18 @@ QtObject {
 
     /// Bookings for an export, read on a worker thread (`list_transactions` enriches every row).
     /// `withBalances` (loadExportPage, #577): also the balance after each booking for the CSV „Saldo“
-    /// column, only for a selection of accounts, as in the list; `done(rows, { bookingID: cents })`.
+    /// column, only for a selection of accounts, as in the list; `done(rows, { bookingID: cents }, tagNote)`.
     function loadExportBookings(accountIDs, preset, bookingIDs, o, ignoreListFilters, done, failed, withBalances) {
         const filter = exportFilter(accountIDs, preset, o, ignoreListFilters)
         filter.with_balances = !!withBalances && ListBalances.selectionHasBalances
+        // the tag note of exactly this query, taken when it starts (`exportReport`)
+        const tagNote = TagFilter.noteFor(filter)
         AppModel.coreAsync("list_transactions", { filter: filter }, page => {
             let rows = page.transactions
             if (bookingIDs) rows = rows.filter(b => bookingIDs.indexOf(b.id) >= 0)
             const balances = {}
             for (const b of page.running_balances || []) balances[b.booking_id] = b.balance_cents
-            done(rows, balances)
+            done(rows, balances, tagNote)
         }, failed)
     }
 
@@ -269,7 +271,8 @@ QtObject {
     }
 
     /// Report for already loaded export bookings (cheap: no vault access).
-    function exportReport(bookings, accountIDs, preset, bookingIDs, o) {
+    /// `tagNote`: from `loadExportBookings`, the tag filter its query applied.
+    function exportReport(bookings, accountIDs, preset, bookingIDs, o, tagNote) {
         const accounts = AppModel.allAccounts.map(a => ({ id: a.id, name: a.name, iban: a.iban, balance_cents: a.balance_cents,
                                                           balance_date: a.balance_date, currency: a.currency, owner: a.owner }))
         let title = AppModel.title
@@ -281,10 +284,10 @@ QtObject {
         const notes = AppModel.directionFilter === "Income" ? [PrintReport.directionTitle("income")]
                     : AppModel.directionFilter === "Expense" ? [PrintReport.directionTitle("expenses")] : []
         // and the tag filter (#228)
-        if (TagFilter.note() !== "") notes.push(TagFilter.note())
+        if (tagNote) notes.push(tagNote)
         return { title: title, period_label: exportPeriodLabel(preset, bookingIDs, o),
                  rows: bookings.map(b => PrintReport.rowFromBooking(b)), accounts: accounts, daily_balances: ({}),
-                 generated_at: new Date(), filter_notes: notes }
+                 generated_at: new Date(), filter_notes: notes, tag_note: tagNote || "" }
     }
 
     // MARK: - ExportSheet › buildFileOptional
@@ -294,10 +297,10 @@ QtObject {
     function buildFile(accountIDs, bookingIDs, o, done, failed) {
         const preset = o.scope === "selection" ? "current" : o.periodPreset
         const camt = isCamt(o.format)
-        loadExportBookings(accountIDs.length ? accountIDs : null, preset, bookingIDs, o, camt, (bookings, balances) => {
+        loadExportBookings(accountIDs.length ? accountIDs : null, preset, bookingIDs, o, camt, (bookings, balances, tagNote) => {
             if (!bookings.length) { done(null); return }
             try {
-                let report = exportReport(bookings, accountIDs, preset, bookingIDs, o)
+                let report = exportReport(bookings, accountIDs, preset, bookingIDs, o, tagNote)
                 report.running_balances = balances
                 report.generated_at = new Date()
                 report = prepareStatement(report)

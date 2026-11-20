@@ -250,9 +250,9 @@ Sheet {
         if (!accountIDs.length) { previewCount = 0; return }
         previewCount = null
         const preset = period(o)
-        BookingExport.loadExportBookings(accountIDs, preset, bookingIDs, o, BookingExport.isCamt(o.format), bookings => {
+        BookingExport.loadExportBookings(accountIDs, preset, bookingIDs, o, BookingExport.isCamt(o.format), (bookings, balances, tagNote) => {
             if (gen !== previewGeneration) return
-            previewCount = BookingExport.exportReport(bookings, accountIDs, preset, bookingIDs, o).rows.length
+            previewCount = BookingExport.exportReport(bookings, accountIDs, preset, bookingIDs, o, tagNote).rows.length
         }, () => {
             if (gen !== previewGeneration) return
             previewCount = 0
