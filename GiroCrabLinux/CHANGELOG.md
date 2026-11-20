@@ -103,6 +103,17 @@ Funktionsumfang der Oberfläche.
 - **Enable Banking (#1005):** Neben „enablebanking.com/cp/applications öffnen“ steht der Link
   „Interaktive Anleitung (3 Min.)“.
 
+### Suche und Privatmodus wie in der Mac-App 0.8.6
+
+- **Suche findet auch die Einzahl:** Die Suche kürzt deutsche Pluralendungen auf den Stamm
+  („kredite“ findet auch „Kredit“, „versicherungen“ auch „Versicherung“). Ein zusammengesetztes Wort
+  mit einem reinen Buchungswort sucht nur seinen Stamm („amazonbestellungen“ → „amazon“). Kurze
+  Wörter, Zahlen, Beträge und IBANs bleiben, wie sie sind, und das Suchfeld zeigt weiter den
+  getippten Text. Die Regeln aus `NaturalSearchParser.swift` stehen in `src/search_terms.rs`, mit
+  Tests. Die natürliche Suche mit dem Sprachmodell gibt es nur am Mac.
+- **Privatmodus (#1007):** Der Tooltip am Auge lautet beim Standard-Umfang „Privatmodus: Beträge und
+  persönliche Angaben ausblenden (Strg+Umschalt+H)“.
+
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
 - **Einstellungen › Analyse:** „Lesenden Zugriff für Programme auf diesem Rechner erlauben“. Programme
