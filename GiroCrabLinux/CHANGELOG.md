@@ -83,6 +83,26 @@ Funktionsumfang der Oberfläche.
   Steuerunterlagen und Mitteilungen aus dem Postfach, höchstens 200 PDFs pro Lauf, und erkennt
   bereits geladene an ihrer ID.
 
+### Weitere Banken und Zugänge wie in der Mac-App 0.8.6
+
+- **Consorsbank Online-Archiv (#1024):** „Bankzugang bearbeiten“ hat bei der Consorsbank über FinTS
+  den Abschnitt „Online-Archiv“ mit „Online-Archiv abrufen“ und „Online-Archiv jetzt abrufen“.
+  Kontoauszüge, Abrechnungen, Depotauszüge und Steuerdokumente kommen höchstens einmal pro Woche
+  beim Abruf mit. Ist „Dokumente abrufen“ aus, ist der Schalter gesperrt, mit Hinweis. Im
+  Freigabedialog wechselt „Manuell mit TAN bestätigen“ bzw. „Mit Consorsbank App bestätigen“ die
+  Freigabe. Die Meldung nach dem Abruf nennt die neuen Dokumente aus dem Online-Archiv.
+- **PayPal über die API-Signatur (#945):** Beim Einrichten wählt „Zugang über“ zwischen API-Signatur
+  (klassische NVP-API) und REST-App; die nötigen Felder wechseln mit. „Bankzugang bearbeiten“ hat
+  „Erweitert: API-Signatur (klassische NVP-API)“ mit API-Benutzername, API-Passwort und Signatur.
+  Passwort und Signatur sind immer verdeckt.
+- **Finpension-Import (#975):** Finpension hat keine Schnittstelle. „Bankzugang bearbeiten“ hat
+  „Finpension-Export importieren …“ für den CSV- oder JSON-Export mit Positionen und
+  Cash-Buchungen; ein erneuter Import legt keine Buchungen doppelt an. „Alle abrufen“ und der Abruf
+  einer Gruppe übergehen Finpension, ein einzelner Abruf verweist auf den Import.
+  `dispatch.rs` liest die Datei (`import_finpension_file`, höchstens 32 MB), mit Test.
+- **Enable Banking (#1005):** Neben „enablebanking.com/cp/applications öffnen“ steht der Link
+  „Interaktive Anleitung (3 Min.)“.
+
 ### Externe Analyse: lokale Schnittstelle und MCP (#136)
 
 - **Einstellungen › Analyse:** „Lesenden Zugriff für Programme auf diesem Rechner erlauben“. Programme
