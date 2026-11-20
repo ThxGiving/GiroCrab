@@ -174,6 +174,7 @@
   "Privater Schlüssel (*.pem *.key *.txt)": "Private key (*.pem *.key *.txt)",
   "Privatmodus beenden (Strg+Umschalt+H)": "Exit Privacy Mode (Ctrl+Shift+H)",
   "Privatmodus: Beträge ausblenden (Strg+Umschalt+H)": "Privacy Mode: Hide amounts (Ctrl+Shift+H)",
+  "Privatmodus: Beträge und persönliche Angaben ausblenden (Strg+Umschalt+H)": "Privacy Mode: Hide amounts and personal details (Ctrl+Shift+H)",
   "Programme auf diesem Rechner, die Sie einrichten, können ausgewählte Konten, Buchungen, Kategorien und Summen lesen. Sie können nichts ändern, keine Zahlungen auslösen und sehen keine Zugangsdaten. Der Zugriff besteht nur, solange GiroCrab läuft und der Tresor entsperrt ist.": "Programs on this computer that you set up can read selected accounts, transactions, categories and totals. They cannot change anything, cannot initiate payments and never see login credentials. Access exists only while GiroCrab is running and the vault is unlocked.",
   "Prüfen Sie die Schreibweise oder versuchen Sie eine neue Suche.": "Check the spelling or try a new search.",
   "Prüfwerte auf der Commerzbank-Website öffnen": "Open the Fingerprints on the Commerzbank Website",
