@@ -6,12 +6,14 @@ import QtQuick.Layouts
 // design page docs/KONTO_EINSTELLUNGEN_UI.md. One sheet, built like the former "Konto
 // bearbeiten" dialog, that replaces "Konto bearbeiten …", "Umbenennen …", "Symbol & Farbe …",
 // "Kontoart ändern …", "Kontoinhaber …" and "Startsaldo …". Changes are applied with Sichern;
-// only Symbol & Farbe applies at once, like its popover always did. The note is the vault
-// setting `account.note.<id>` (SidebarModel).
+// only Symbol & Farbe applies at once, like its popover always did. The note is a field of the
+// account, synced like its name (#980).
 Sheet {
     id: sheet
     property var accountID: null
     readonly property var account: accountID === null ? null : (AppModel.accountsByID[accountID] || null)
+    /// The account when the sheet opened: what a sync changes meanwhile is no edit here (#980).
+    property var original: null
     /// an offline account is always cash (#679): no Kontoart
     readonly property bool offline: accountID !== null && OfflineAccounts.isOffline(accountID)
     /// The Startsaldo only exists for accounts whose balance is computed from the bookings.
@@ -26,20 +28,21 @@ Sheet {
         const a = AppModel.accountsByID[id]
         if (!a) return
         accountID = id
+        original = a
         nameField.text = a.name
         ownerField.text = a.owner || ""
         kindBox.currentIndex = Math.max(0, AppModel.accountKindChoices.findIndex(k => k.id === a.kind))
         showsOpeningBalance = AppModel.canSetOpeningBalance(a)
         openingField.text = a.opening_balance_cents !== null && a.opening_balance_cents !== undefined ? Fmt.plain(a.opening_balance_cents) : ""
-        noteField.text = SidebarModel.accountNote(id)
+        noteField.text = a.note || ""
         archivedBox.checked = a.archived_unix !== null
         open()
         nameField.forceActiveFocus()
     }
 
     function save() {
-        const a = account
-        if (!a || !canSave) return
+        const a = original
+        if (!a || !account || !canSave) return
         const newName = nameField.text.trim()
         const owner = ownerField.text.trim()
         const kind = AppModel.accountKindChoices[kindBox.currentIndex].id
@@ -47,7 +50,7 @@ Sheet {
         if (newName !== a.name) AppModel.renameAccount(a.id, newName)
         if (owner !== (a.owner || "")) AppModel.setAccountOwner(a.id, owner)
         if (kind !== a.kind && !offline) AppModel.setAccountKind(a.id, kind)
-        if (note !== SidebarModel.accountNote(a.id)) SidebarModel.setAccountNote(a.id, note)
+        if (note !== (a.note || "")) AppModel.setAccountNote(a.id, note)
         if (showsOpeningBalance) {
             const text = openingField.text.trim()
             const stored = a.opening_balance_cents === undefined ? null : a.opening_balance_cents

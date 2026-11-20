@@ -83,7 +83,7 @@ Card {
                 }
                 // BalanceHeaderView.swift: the account note (AccountSettingsView, #605)
                 Text {
-                    readonly property string note: card.account ? SidebarModel.accountNote(card.account.id) : ""
+                    readonly property string note: card.account ? (card.account.note || "") : ""
                     visible: note !== "" && !card.compact
                     text: note; font.pixelSize: Theme.caption; color: Theme.secondary
                     wrapMode: Text.WordWrap; maximumLineCount: 2; elide: Text.ElideRight; Layout.fillWidth: true

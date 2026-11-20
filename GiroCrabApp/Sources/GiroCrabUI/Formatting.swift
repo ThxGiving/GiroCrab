@@ -161,9 +161,15 @@ enum Money {
 
     /// i64 cents -> "1.234,56 €" / "€1,234.56" in the user's locale (Decimal, never Double).
     static func format(_ cents: Int64, currency code: String = "EUR") -> String {
-        currency.currencyCode = code
+        currency.currencyCode = code.isEmpty ? "EUR" : code.uppercased()
         let s = currency.string(from: (Decimal(cents) / 100) as NSDecimalNumber) ?? "\(cents)"
         return s.replacingOccurrences(of: "-", with: "−")
+    }
+
+    /// "$" / "€" / "CHF": the symbol of `code` in the user's locale (chart axes).
+    static func symbol(_ code: String) -> String {
+        currency.currencyCode = code
+        return currency.currencySymbol ?? code
     }
 
     /// "+1.234,56 €" for inflows.
@@ -186,7 +192,7 @@ enum Money {
     /// kind present: it is a grouping separator if it is the locale's grouping
     /// separator and every group after it has exactly three digits.
     static func parseCents(_ input: String) -> Int64? {
-        let t = input.filter { !($0 == "€" || $0.isWhitespace || $0 == "'") }
+        let t = input.filter { !($0.isCurrencySymbol || $0.isWhitespace || $0 == "'") }
         guard !t.isEmpty else { return nil }
         let seps: Set<Character> = [".", ","]
         let used = Set(t.filter { seps.contains($0) })
@@ -498,7 +504,9 @@ extension ConnectorKind {
         case .ffb: return "FFB (FIL Fondsbank)"
         case .fordMoney: return "Ford Money"
         case .opelDirektbank: return "Opel Direktbank"
+        case .bhw: return "BHW Bausparkasse"
         case .finpension: return "Finpension"
+        case .kontist: return "Kontist"
         }
     }
 
@@ -530,7 +538,9 @@ extension ConnectorKind {
         case .ffb: return "#1C5A8C"
         case .fordMoney: return "#20396E"
         case .opelDirektbank: return "#1A1A1A"
+        case .bhw: return "#C8102E"
         case .finpension: return "#00A68C"
+        case .kontist: return "#2B2D73"
         }
     }
 
@@ -569,7 +579,9 @@ extension ConnectorKind {
         case .ffb: return "FFB"
         case .fordMoney: return "FM"
         case .opelDirektbank: return "OD"
+        case .bhw: return "BHW"
         case .finpension: return "FP"
+        case .kontist: return "KT"
         }
     }
 }

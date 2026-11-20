@@ -163,6 +163,11 @@ Sheet {
         suggestions = []
         amountField.forceActiveFocus()
     }
+    /// "Nicht mehr vorschlagen" (#978): the list is read again in place, whatever has the focus.
+    function hideRecipient(iban) {
+        AppModel.setRecipientHidden(iban, true)
+        suggestions = recipients(draft.name)
+    }
 
     /// Fills name and IBAN from the chosen own account (owner, else account name).
     function applyOwnTarget(id) {
@@ -268,6 +273,13 @@ Sheet {
                 visible: !sheet.confirming
                 flat: true; icon.name: SF.icon("doc.on.doc"); text: qsTr("Vorlagen")
                 onClicked: templatesMenu.popup(templatesButton, 0, templatesButton.height)
+            }
+            Button {
+                visible: !sheet.confirming
+                flat: true; icon.name: SF.icon("person.2"); text: qsTr("Empfänger")
+                onClicked: recipientsDialog.open()
+                ToolTip.text: qsTr("Empfänger verwalten: veraltete IBANs nicht mehr vorschlagen")
+                ToolTip.visible: hovered; ToolTip.delay: 600
             }
             Button {
                 visible: !sheet.confirming
@@ -813,16 +825,29 @@ Sheet {
                     width: suggestionColumn.width; height: rowText.implicitHeight + 8
                     radius: 6
                     color: index === sheet.highlighted ? Theme.selection : "transparent"
+                    // one row per IBAN with its last use; ✕: "Nicht mehr vorschlagen" (#978). No
+                    // context menu: a menu takes the focus from the name field, which clears the list.
                     Column {
                         id: rowText
-                        x: 8; y: 4; width: parent.width - 16
+                        x: 8; y: 4; width: parent.width - 16 - hideButton.width
                         spacing: 1
                         Text { width: parent.width; text: suggestionRow.modelData.name; font.pixelSize: Theme.body; color: Theme.text; elide: Text.ElideRight; Sensitive {} }
                         Text { width: parent.width; text: Fmt.iban(suggestionRow.modelData.iban); font.pixelSize: Theme.caption; font.family: "monospace"
                                color: Theme.secondary; elide: Text.ElideRight; Sensitive {} }
+                        Text { width: parent.width; text: qsTr("zuletzt %1").arg(Fmt.medium(suggestionRow.modelData.last_used)); font.pixelSize: Theme.caption2; color: Theme.tertiary }
                     }
                     HoverHandler { onHoveredChanged: if (hovered) sheet.highlighted = suggestionRow.index }
                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: sheet.pick(suggestionRow.modelData) }
+                    IconButton {
+                        id: hideButton
+                        anchors.right: parent.right; anchors.rightMargin: 4; anchors.verticalCenter: parent.verticalCenter
+                        // a click must leave the focus in the name field (it keeps the list)
+                        focusPolicy: Qt.NoFocus
+                        symbol: "xmark.circle.fill"; symbolSize: 13; implicitWidth: 22; implicitHeight: 22
+                        ToolTip.text: qsTr("Nicht mehr vorschlagen")
+                        Accessible.name: qsTr("Nicht mehr vorschlagen")
+                        onClicked: sheet.hideRecipient(suggestionRow.modelData.iban)
+                    }
                 }
             }
         }
@@ -929,6 +954,9 @@ Sheet {
             onTriggered: { templateNameField.text = sheet.draft.name; templateName.open() }
         }
     }
+
+    // .capturableSheet { KnownRecipientsSheet() }: hidden IBANs drop out of the chips at once
+    KnownRecipientsDialog { id: recipientsDialog; onClosed: sheet.refreshSuggestions() }
 
     // .alert("Vorlage speichern") { TextField("Name der Vorlage") }
     Sheet {

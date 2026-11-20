@@ -102,12 +102,13 @@ QtObject {
     }
     function openNewAccount() { runInOwnVault(() => { store.showNewAccount = true }) }
 
-    /// "Neues Offline-Konto …": always cash; the note is the account note (SidebarModel).
+    /// "Neues Offline-Konto …": always cash, with its account note (#980).
     function createOfflineAccount(name, note, openingCents) {
         runInOwnVault(() => {
-            const id = AppModel.run(() => AppModel.core("create_offline_account", { name: name, kind: "Cash", opening_cents: openingCents }))
+            const id = AppModel.run(() => AppModel.core("create_offline_account", { name: name, kind: "Cash", currency: "", opening_cents: openingCents }))
             if (id === undefined) return
-            if (note.trim() !== "") SidebarModel.setAccountNote(id, note)
+            // the note is a field of the account (#980): set before the one reload
+            if (note.trim() !== "") AppModel.run(() => { AppModel.core("set_account_note", { account_id: id, note: note.trim() }); return true })
             AppModel.reloadAccounts(() => { AppModel.sidebarSelection = "account:" + id })
         })
     }

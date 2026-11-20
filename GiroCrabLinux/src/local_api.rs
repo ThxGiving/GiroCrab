@@ -16,10 +16,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, Weak};
 use std::time::{Duration, Instant};
 
-use girocrab_core::local_api::server::LocalApiServer;
 use girocrab_core::local_api::ShareScope;
+use girocrab_core::local_api::server::LocalApiServer;
 use girocrab_core::{CoreError, Vault};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 /// `RunningLocalApi`: the socket and the vault it serves.
 struct Running {
