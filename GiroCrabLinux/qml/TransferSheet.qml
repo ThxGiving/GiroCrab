@@ -504,9 +504,20 @@ Sheet {
                             label: qsTr("Verwendungszweck")
                             fillValue: true
                             TextArea {
+                                id: purposeArea
                                 Layout.fillWidth: true
                                 Layout.maximumHeight: 3 * contentHeight / Math.max(1, lineCount) + topPadding + bottomPadding
                                 font.pixelSize: Theme.body
+                                color: Theme.text
+                                placeholderTextColor: Theme.tertiary
+                                leftPadding: 8; rightPadding: 8; topPadding: 5; bottomPadding: 5
+                                // the same rounded bezel as the TransferFields
+                                background: Rectangle {
+                                    radius: 6
+                                    color: Theme.card
+                                    border.width: purposeArea.activeFocus ? 2 : 1
+                                    border.color: purposeArea.activeFocus ? Theme.withAlpha(Theme.accent, 0.7) : Theme.border
+                                }
                                 placeholderText: qsTr("optional")
                                 wrapMode: TextEdit.Wrap
                                 text: sheet.draft.purpose
@@ -1005,10 +1016,21 @@ Sheet {
     }
 
     /// transferField(): a bezeled text field of the transfer form (#881), so an empty field reads as a field.
+    /// `.textFieldStyle(.roundedBorder)`: rounded corners and a fine border, the accent ring on focus.
     component TransferField: TextField {
+        id: tf
         Layout.fillWidth: true
         font.pixelSize: Theme.body
+        color: Theme.text
+        placeholderTextColor: Theme.tertiary
         selectByMouse: true
+        leftPadding: 8; rightPadding: 8; topPadding: 5; bottomPadding: 5
+        background: Rectangle {
+            radius: 6
+            color: tf.enabled ? Theme.card : Theme.withAlpha(Theme.card, 0.5)
+            border.width: tf.activeFocus ? 2 : 1
+            border.color: tf.activeFocus ? Theme.withAlpha(Theme.accent, 0.7) : Theme.border
+        }
     }
     component Hint: RowLayout {
         property alias text: hintText.text
