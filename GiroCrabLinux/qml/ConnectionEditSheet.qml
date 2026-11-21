@@ -295,9 +295,9 @@ Sheet {
                 SettingsFormSection {
                     title: qsTr("Zugang")
                     SettingsFormRow { label: qsTr("Anzeigename")
-                        TextField { text: sheet.name; onTextEdited: sheet.name = text; Layout.fillWidth: true; Layout.preferredWidth: 300 } }
+                        TextField { text: sheet.name; onTextEdited: sheet.name = text; Layout.fillWidth: true; Layout.preferredWidth: 300; Sensitive {} } }
                     SettingsFormRow { label: sheet.descriptor ? sheet.descriptor.login_label : qsTr("Benutzerkennung")
-                        TextField { text: sheet.login; onTextEdited: sheet.login = text; enabled: !sheet.isRah10; Layout.fillWidth: true; Layout.preferredWidth: 300 } }
+                        TextField { text: sheet.login; onTextEdited: sheet.login = text; enabled: !sheet.isRah10; Layout.fillWidth: true; Layout.preferredWidth: 300; Sensitive {} } }
                     SettingsFormRow { visible: sheet.isTR && sheet.login !== ""; label: qsTr("Gespeichert als"); personal: true
                               value: sheet.isTR && sheet.login !== "" ? AppModel.core("normalize_phone_number", { input: sheet.login }) : "" }
                     SettingsFormRow {
